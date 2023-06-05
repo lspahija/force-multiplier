@@ -32,7 +32,9 @@ def get_diff(document, feedback):
             "replacement": "Susy had a"
         }
     ]
-
+    
+    I won't response with anything other than JSON.
+    
     Each block of text to be replaced is represented as a dictionary with the keys 'start', 'end', and 'replacement'. If multiple blocks of text need to be replaced, I will return a list of such dictionaries.
     """
 
