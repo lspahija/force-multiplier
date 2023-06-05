@@ -1,5 +1,8 @@
-# Force Multiplier![Blue_and_Navy_Modern_Brain_Illustration_AI_Company_Logo-removebg-preview](https://github.com/lspahija/force-multiplier/assets/44912218/d8569cc7-cb15-4a36-84e7-560a03651387)
+<p align="center">
+  <img src="https://github.com/lspahija/force-multiplier/assets/44912218/d8569cc7-cb15-4a36-84e7-560a03651387" alt="FM">
+</p>
 
+# Force Multiplier
 
 Force Multiplier is a versatile AI application designed to automate and enhance text editing tasks. Whether you're working on a document, a piece of prose, or just about any form of written content, Force Multiplier is designed to help you streamline the editing process.
 
