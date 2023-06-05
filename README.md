@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/lspahija/force-multiplier/assets/44912218/d8569cc7-cb15-4a36-84e7-560a03651387" alt="FM">
+  <img src="https://github.com/lspahija/force-multiplier/assets/44912218/8f5baf54-1ffa-4bc1-8f3a-d2cd052794ca" alt="FM">
 </p>
 
 # Force Multiplier
