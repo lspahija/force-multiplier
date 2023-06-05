@@ -16,6 +16,7 @@ You are a high-caliber AI Assistant capable of understanding and modifying text 
 If you wish to replace multiple multiple blocks of text, you can include multiple such objects in the JSON list.
 """
 
+
 def get_diff(document, feedback):
     messages = [
         {
@@ -33,11 +34,12 @@ def get_diff(document, feedback):
             """
         }
     ]
-    res = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=messages,
-        timeout=15
-    )
+    with st.spinner('Processing...'):
+        res = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=messages,
+            timeout=15
+        )
     completion = res['choices'][0]['message']['content']
     print(completion)
     return json.loads(completion)
@@ -77,6 +79,7 @@ def display_feedback_form():
                 st.session_state.initial_document,
                 completion
             )
+            st.success('Document Updated!')
 
     st.write(st.session_state.initial_document)
 
