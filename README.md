@@ -13,7 +13,7 @@ The worker then takes the supervisor's feedback and modifies the artifact iterat
 
 The supervisor's job of examining the artifact and providing feedback can be done much faster than the worker's job of producing and modifying the artifact.
 
-LLMs are orders of magnitude faster than humans at producing artifacts. Therefore, let's replace human workers with an LLM. We only wish to supervise!
+LLMs are orders of magnitude faster than humans at producing artifacts. Therefore, let's replace human workers with an LLM. Humans should only supervise!
 
 ### Worker -> Supervisor
 
