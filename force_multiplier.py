@@ -35,7 +35,7 @@ def get_diff(document, feedback):
     
     I won't response with anything other than JSON.
     
-    Each block of text to be replaced is represented as a dictionary with the keys 'start', 'end', and 'replacement'. If multiple blocks of text need to be replaced, I will return a list of such dictionaries.
+    Each block of text to be replaced is represented as a JSON object with the keys 'start', 'end', and 'replacement'. If multiple blocks of text need to be replaced, I will return a list of such JSON objects.
     """
 
     messages = [
@@ -98,10 +98,10 @@ def display_feedback_form():
         feedback = st.text_area('Your feedback')
         submitted = st.form_submit_button('Submit')
         if submitted:
-            completion = get_diff(st.session_state.initial_document, feedback)
+            completion = get_diff(document=st.session_state.initial_document, feedback=feedback)
             st.session_state.initial_document = apply_completion_to_document(
-                st.session_state.initial_document,
-                completion
+                document=st.session_state.initial_document,
+                completion=completion
             )
             st.success('Document Updated!')
 
