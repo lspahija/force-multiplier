@@ -4,7 +4,7 @@
 
 # Force Multiplier
 
-### The goal of Force Multiplier is to turn every human worker into a supervisor.
+### The goal of Force Multiplier is to turn every human worker into a supervisor
 
 Most workers today need to produce some sort of artifact (e.g. code, legal contract, documentation, essay, etc.)
 
