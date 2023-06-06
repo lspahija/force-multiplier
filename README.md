@@ -25,7 +25,7 @@ Force Multiplier only modifies the portions of your artifact that require modifi
 
 ### Core Functionality
 
-Force Multiplier allows you to input any block of text as your initial document. You can then provide your feedback on this document, in terms of specific changes or overall sentiment. The AI Assistant will take your feedback, interpret it, and then propose modifications to the document in a structured JSON format.
+Force Multiplier allows you to input any block of text as your initial document (artifact). You can then provide your feedback on this document, in terms of specific changes or overall sentiment. The AI Assistant will take your feedback, interpret it, and then propose modifications to the document in a structured JSON format.
 
 The modifications are detailed in terms of the starting and ending words of the blocks of text that need to be replaced, as well as the proposed replacement text. It's designed to cater to multiple modifications at once, enabling you to refine your document in an iterative manner, leading to a more polished output.
 
