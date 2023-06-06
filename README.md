@@ -4,7 +4,24 @@
 
 # Force Multiplier
 
-Force Multiplier is a versatile AI application designed to automate and enhance text editing tasks. Whether you're working on a document, a piece of prose, or just about any form of written content, Force Multiplier is designed to help you streamline the editing process.
+The goal of Force Multiplier is to turn every human worker into a supervisor.
+
+Most workers today need to produce some sort of artifact (e.g. code, legal contract, documentation, essay, etc.)
+
+It takes human workers a relatively long time to produce the artifact. When a draft of the artifact is produced, it is presented to a supervisor who provides feedback.
+The worker then takes the supervisor's feedback and modifies the artifact iteratively until the supervisor is satisfied.
+
+The supervisor's job of examining the artifact and providing feedback can be done much faster than the worker's job of producing and modifying the artifact.
+
+LLMs are orders of magnitude faster than humans at producing artifacts. Therefore, let's replace human workers with an LLM. We only wish to supervise!
+
+### Worker -> Supervisor
+
+Using Force Multiplier, we all become supervisors. Force Multiplier allows us to iteratively provide feedback, with AI modifying the artifact until we are completely satisfied with the result.
+
+### Efficiency
+
+Force Multiplier only modifies the portions of your artifact that require modification, given your feedback. The rest of the artifact remains unchanged. This allows for fast iteration because it's not necessary to wait for the LLM to regenerate the entire artifact after each piece of feedback.
 
 ### Core Functionality
 
