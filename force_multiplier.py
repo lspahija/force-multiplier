@@ -63,14 +63,35 @@ def get_diff(document, feedback):
         }
     ]
 
-    res = openai.ChatCompletion.create(
+    # completion = get_completion(messages)
+    completion = get_mock_completion(document)
+    print(completion)
+    return json.loads(completion, object_hook=lambda d: SimpleNamespace(**d))
+
+
+def get_completion(messages):
+    return openai.ChatCompletion.create(
         model="gpt-4",
         messages=messages,
         timeout=15
-    )
-    completion = res['choices'][0]['message']['content']
-    print(completion)
-    return json.loads(completion, object_hook=lambda d: SimpleNamespace(**d))
+    )['choices'][0]['message']['content']
+
+
+def get_mock_completion(document):
+    words = document.split()
+    if len(words) == 0:
+        return None
+    first_word = words[0]
+    last_word = words[-1]
+
+    return f"""
+    [
+        {{
+            "start": "{first_word}",
+            "end": "{last_word}",
+            "replacement": "This is a mocked replacement."
+        }}
+    ]"""
 
 
 def apply_diff(document, diff):
