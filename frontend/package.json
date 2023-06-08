@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@mantine/core": "^6.0.13",
+    "@mantine/hooks": "^6.0.13",
     "@ricky0123/vad-react": "^0.0.17",
     "axios": "^1.4.0",
     "react": "^18.2.0",
