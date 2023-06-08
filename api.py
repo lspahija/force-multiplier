@@ -32,6 +32,6 @@ class DocumentFeedback(BaseModel):
 
 
 @app.post("/modify")
-def modify_document(audio: UploadFile, document: str = Header(default=None)):
+async def modify_document(audio: UploadFile, document: str = Header(default=None)):
     feedback = await transcribe(audio)
     return apply_feedback(document, feedback)

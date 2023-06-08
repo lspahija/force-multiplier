@@ -5,10 +5,9 @@ import json
 
 
 def apply_feedback(document, feedback):
-    return apply_diff(
-        document=document,
-        diff=get_diff(document=document, feedback=feedback)
-    )
+    diff = apply_diff(document=document, diff=get_diff(document=document, feedback=feedback))
+    print(diff)
+    return diff
 
 
 def get_diff(document, feedback):
@@ -41,7 +40,7 @@ def get_diff(document, feedback):
         }
     ]
     
-    I won't response with anything other than JSON.
+    I will absolutely never respond with anything other than JSON.
     
     Each block of text to be replaced is represented as a JSON object with the keys 'start', 'end', and 'replacement'. If multiple blocks of text need to be replaced, I will return a list of such JSON objects.
     """

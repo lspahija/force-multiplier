@@ -2,6 +2,7 @@ import React, {useState, ChangeEvent, MouseEvent} from "react";
 import axios from "axios";
 import {BeatLoader} from 'react-spinners';
 import {useMicVAD} from "@ricky0123/vad-react";
+import {utils} from "@ricky0123/vad-react";
 
 const App: React.FC = () => {
     const [document, setDocument] = useState<string>("");
@@ -9,6 +10,68 @@ const App: React.FC = () => {
     const [processedDocument, setProcessedDocument] = useState<string>("");
     const [isDocumentSubmitted, setDocumentSubmitted] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    const processAudio = async (audio) => {
+        const blob = createAudioBlob(audio);
+        await validate(blob);
+        sendData(blob);
+    };
+
+    const sendData = (blob) => {
+        console.log("sending data");
+        setIsLoading(true);
+        fetch("http://localhost:8000/modify", {
+            method: "POST",
+            body: createBody(blob),
+            headers: {
+                'document': processedDocument
+            }
+        })
+            .then(handleResponse)
+            .then(handleSuccess)
+            .catch(handleError);
+    };
+
+    const handleResponse = async (res) => {
+        if (!res.ok) {
+            return res.text().then(error => {
+                throw new Error(error);
+            });
+        }
+
+        return res.json();
+    };
+
+    const handleSuccess = async (newDocument) => {
+        console.log("handled success")
+        console.log(newDocument)
+        setProcessedDocument(newDocument);
+        setFeedback("");
+        setIsLoading(false)
+    };
+
+    const handleError = (error) => {
+        console.log(`error encountered: ${error.message}`);
+    };
+
+    const createBody = (data) => {
+        const formData = new FormData();
+        formData.append("audio", data, "audio.wav");
+        return formData;
+    };
+
+    const createAudioBlob = (audio) => {
+        const wavBuffer = utils.encodeWAV(audio);
+        return new Blob([wavBuffer], {type: 'audio/wav'});
+    };
+
+    const validate = async (data) => {
+        const decodedData = await new AudioContext().decodeAudioData(await data.arrayBuffer());
+        const duration = decodedData.duration;
+        const minDuration = 0.4;
+
+        if (duration < minDuration) throw new Error(`Duration is ${duration}s, which is less than minimum of ${minDuration}s`);
+    };
 
     useMicVAD({
         preSpeechPadFrames: 5,
@@ -19,8 +82,9 @@ const App: React.FC = () => {
         onSpeechStart: () => {
             console.log("speech started here")
         },
-        onSpeechEnd: (audio) => {
+        onSpeechEnd: async (audio) => {
             console.log("speech ended here")
+            await processAudio(audio);
         },
         onVADMisfire: () => {
             console.log("misfire occurred here")
@@ -31,32 +95,10 @@ const App: React.FC = () => {
         setDocument(e.target.value);
     };
 
-    const handleFeedbackChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-        setFeedback(e.target.value);
-    };
-
     const handleDocumentSubmit = (e: MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         setProcessedDocument(document);  // update processedDocument here
         setDocumentSubmitted(true);
-    };
-
-    const handleSubmitFeedback = async (e: MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        setIsLoading(true);
-        try {
-            const res = await axios.post<string>("http://localhost:8000/modify", {
-                document: processedDocument,
-                feedback: feedback,
-            });
-            console.log(res.data);
-            setProcessedDocument(res.data);
-            setFeedback("");
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setIsLoading(false);
-        }
     };
 
     return (
@@ -75,12 +117,6 @@ const App: React.FC = () => {
                 <>
                     <h2>Processed Document:</h2>
                     <pre>{processedDocument}</pre>
-                    <textarea
-                        placeholder="Your feedback"
-                        value={feedback}
-                        onChange={handleFeedbackChange}
-                    />
-                    <button onClick={handleSubmitFeedback}>Submit</button>
                     {isLoading && <BeatLoader color="#26D0CE"/>}
                 </>
             )}
