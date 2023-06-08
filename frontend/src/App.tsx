@@ -17,14 +17,13 @@ const App: React.FC = () => {
         minSpeechFrames: 4,
         startOnLoad: true,
         onSpeechStart: () => {
-            console.log("speech started")
+            console.log("speech started here")
         },
         onSpeechEnd: (audio) => {
-            console.log("speech ended")
-            console.log(audio)
+            console.log("speech ended here")
         },
         onVADMisfire: () => {
-            console.log("misfire occurred")
+            console.log("misfire occurred here")
         },
     })
 
