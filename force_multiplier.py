@@ -6,7 +6,6 @@ import json
 
 def apply_feedback(document, feedback):
     diff = apply_diff(document=document, diff=get_diff(document=document, feedback=feedback))
-    print(diff)
     return diff
 
 
