@@ -5,13 +5,13 @@ import json
 
 
 def apply_feedback(document, feedback):
-    return _apply_diff(
+    return apply_diff(
         document=document,
-        diff=_get_diff(document=document, feedback=feedback)
+        diff=get_diff(document=document, feedback=feedback)
     )
 
 
-def _get_diff(document, feedback):
+def get_diff(document, feedback):
     system_prompt = """
     I am an AI capable of editing text based on user feedback. You can give me a document and your feedback about the document, and I will propose changes.
 
@@ -75,7 +75,7 @@ def _get_diff(document, feedback):
     return json.loads(completion, object_hook=lambda d: SimpleNamespace(**d))
 
 
-def _apply_diff(document, diff):
+def apply_diff(document, diff):
     for change in diff:
         start = change.start
         end = change.end
