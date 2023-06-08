@@ -1,6 +1,7 @@
 import React, {useState, ChangeEvent, MouseEvent} from "react";
 import axios from "axios";
 import {BeatLoader} from 'react-spinners';
+import {useMicVAD} from "@ricky0123/vad-react";
 
 const App: React.FC = () => {
     const [document, setDocument] = useState<string>("");
@@ -8,6 +9,24 @@ const App: React.FC = () => {
     const [processedDocument, setProcessedDocument] = useState<string>("");
     const [isDocumentSubmitted, setDocumentSubmitted] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    useMicVAD({
+        preSpeechPadFrames: 5,
+        positiveSpeechThreshold: 0.90,
+        negativeSpeechThreshold: 0.75,
+        minSpeechFrames: 4,
+        startOnLoad: true,
+        onSpeechStart: () => {
+            console.log("speech started")
+        },
+        onSpeechEnd: (audio) => {
+            console.log("speech ended")
+            console.log(audio)
+        },
+        onVADMisfire: () => {
+            console.log("misfire occurred")
+        },
+    })
 
     const handleDocumentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         setDocument(e.target.value);
