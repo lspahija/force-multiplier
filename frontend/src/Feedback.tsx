@@ -114,18 +114,24 @@ export function Feedback() {
 
     return (
         <Container size={700} className={classes.inner}>
-            {!isSpeaking && !isProcessing && <Title
-                variant="gradient"
-                gradient={{from: 'indigo', to: 'cyan', deg: 45}}
-                order={2}
-                size="h1"
-                sx={(theme) => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
-                weight={900}
-                align="center"
-                className={classes.title}
-            >
-                Provide Your Feedback
-            </Title>}
+            {!isSpeaking && !isProcessing && <>
+                <Title
+                    variant="gradient"
+                    gradient={{from: 'indigo', to: 'cyan', deg: 45}}
+                    order={2}
+                    size="h1"
+                    sx={(theme) => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
+                    weight={900}
+                    align="center"
+                >
+                    Provide Your Feedback
+                </Title>
+                <Text
+                    fz="sm"
+                    align={"center"}
+                    className={classes.title}>(Yes, just talk and describe the changes you'd like to see)
+                </Text>
+            </>}
 
             <Container size={100}>
                 {isSpeaking && <Loader size="xl" variant="bars"/>}
