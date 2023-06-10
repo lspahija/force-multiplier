@@ -24,9 +24,9 @@ export function Feedback() {
 
     const location = useLocation()
     const {document} = location.state
-    const [currentDocument, setCurrentDocument] = useState<string>(document);
+    const [currentDocument, setCurrentDocument] = useState<string>(document)
     const [isSpeaking, setIsSpeaking] = useState(false)
-    const [isProcessing, setIsProcessing] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false)
 
     useMicVAD({
         preSpeechPadFrames: 5,
@@ -137,7 +137,6 @@ export function Feedback() {
                 {isSpeaking && <Loader size="xl" variant="bars"/>}
                 {isProcessing && <Loader size="xl"/>}
             </Container>
-
             <Text fz="md">{currentDocument}</Text>
         </Container>
     );
