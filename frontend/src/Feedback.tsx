@@ -157,7 +157,7 @@ export function Feedback() {
                         align="center"
                         className={classes.paddingTop}
                     >
-                        Your last feedback
+                        Your last feedback:
                     </Title>
                     <Text fz="md" align={"justify"} className={classes.paddingBoth}>{feedback}</Text>
                 </>
@@ -171,7 +171,7 @@ export function Feedback() {
                 align="center"
                 className={classes.paddingTop}
             >
-                The newest version of your text
+                Your auto-updating text:
             </Title>
             <Text fz="md" align={"justify"} className={classes.paddingTop}>{currentDocument}</Text>
         </Container>
