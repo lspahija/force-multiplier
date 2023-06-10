@@ -1,4 +1,4 @@
-import {Title, Text, createStyles, rem, Container, Loader} from '@mantine/core';
+import {Title, Text, createStyles, rem, Container, Loader, Divider} from '@mantine/core';
 import {useLocation} from "react-router-dom";
 import {useState} from "react";
 import {useMicVAD, utils} from "@ricky0123/vad-react";
@@ -14,8 +14,15 @@ const useStyles = createStyles((theme) => ({
             paddingTop: rem(80),
         },
     },
-    title: {
-        paddingBottom: rem(40)
+    paddingBottom: {
+        paddingBottom: rem(20)
+    },
+    paddingBoth: {
+        paddingTop: rem(20),
+        paddingBottom: rem(20)
+    },
+    paddingTop: {
+        paddingTop: rem(20),
     }
 }));
 
@@ -27,6 +34,7 @@ export function Feedback() {
     const [currentDocument, setCurrentDocument] = useState<string>(document)
     const [isSpeaking, setIsSpeaking] = useState(false)
     const [isProcessing, setIsProcessing] = useState(false)
+    const [feedback, setFeedback] = useState<string | null>(null)
 
     useMicVAD({
         preSpeechPadFrames: 5,
@@ -102,8 +110,9 @@ export function Feedback() {
         return res.json();
     };
 
-    const handleSuccess = (newDocument) => {
-        setCurrentDocument(newDocument);
+    const handleSuccess = (data) => {
+        setCurrentDocument(data.modified_document);
+        setFeedback(data.feedback);
         setIsProcessing(false);
     };
 
@@ -118,10 +127,10 @@ export function Feedback() {
                 <Title
                     variant="gradient"
                     gradient={{from: 'indigo', to: 'cyan', deg: 45}}
-                    order={2}
+                    order={1}
                     size="h1"
                     sx={(theme) => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
-                    weight={900}
+                    weight={700}
                     align="center"
                 >
                     Provide Your Feedback
@@ -129,15 +138,42 @@ export function Feedback() {
                 <Text
                     fz="sm"
                     align={"center"}
-                    className={classes.title}>(Yes, just talk and describe the changes you'd like to see)
+                    className={classes.paddingBottom}>(Yes, just talk and describe the changes you'd like to see)
                 </Text>
             </>}
 
-            <Container size={100}>
+            <Container size={50}>
                 {isSpeaking && <Loader size="xl" variant="bars"/>}
                 {isProcessing && <Loader size="xl"/>}
             </Container>
-            <Text fz="md">{currentDocument}</Text>
+            {feedback &&
+                <>
+                    <Divider my="sm"/>
+                    <Title
+                        order={2}
+                        size="h4"
+                        sx={(theme) => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
+                        weight={700}
+                        align="center"
+                        className={classes.paddingTop}
+                    >
+                        Your last feedback
+                    </Title>
+                    <Text fz="md" className={classes.paddingBoth}>{feedback}</Text>
+                </>
+            }
+            <Divider my="sm"/>
+            <Title
+                order={2}
+                size="h4"
+                sx={(theme) => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
+                weight={700}
+                align="center"
+                className={classes.paddingTop}
+            >
+                The newest version of your text
+            </Title>
+            <Text fz="md" className={classes.paddingTop}>{currentDocument}</Text>
         </Container>
     );
 }

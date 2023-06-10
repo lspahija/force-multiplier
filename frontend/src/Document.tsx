@@ -13,6 +13,9 @@ const useStyles = createStyles((theme) => ({
             paddingTop: rem(80),
         },
     },
+    paddingBottom: {
+        paddingBottom: rem(10)
+    },
 }));
 
 export function Document() {
@@ -26,15 +29,16 @@ export function Document() {
                 order={2}
                 size="h1"
                 sx={(theme) => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
-                weight={900}
+                weight={600}
                 align="center"
+                className={classes.paddingBottom}
             >
-                Starting Text
+                Enter your starting text
             </Title>
 
             <Textarea
                 mt="md"
-                placeholder="Your text"
+                placeholder="This is a story about a cat named Milo and a dog named Kelly. Bla bla bla..."
                 maxRows={10}
                 minRows={5}
                 autosize

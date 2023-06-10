@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import FastAPI, UploadFile, Header
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,6 +8,7 @@ from force_multiplier import apply_feedback
 from stt import transcribe
 
 app = FastAPI()
+logging.basicConfig(level=logging.INFO)
 
 origins = [
     "http://127.0.0.1",
@@ -34,4 +37,9 @@ class DocumentFeedback(BaseModel):
 @app.post("/modify")
 async def modify_document(audio: UploadFile, document: str = Header(default=None)):
     feedback = await transcribe(audio)
-    return apply_feedback(document, feedback)
+    modified_document = apply_feedback(document, feedback)
+
+    return {
+        "feedback": feedback,
+        "modified_document": modified_document,
+    }
