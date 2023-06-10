@@ -33,3 +33,26 @@ Force Multiplier only modifies the portions of your artifact that require modifi
 Force Multiplier allows you to input any block of text as your initial document (artifact). You can then provide your feedback on this document, in terms of specific changes or overall sentiment. Force Multiplier will take your feedback, interpret it, and automatically modify your document in accordance with the feedback you provided.
 
 You can iteratively provide feedback and watch your document change before your eyes until you arrive at your desired end result.
+
+## Run it Locally  
+1. Clone the repo
+```bash
+git clone git@github.com:lspahija/force-multiplier.git
+```
+2. Change directory to AIUI
+```bash
+cd force-multiplier
+```
+3. Build Docker image
+```bash
+docker build -t forcemultiplier .
+``` 
+or if on arm64 architecture (including Apple Silicon): 
+```bash
+docker buildx build --platform linux/arm64 -t forcemultiplier .
+```
+4. Create Docker container from image
+```bash
+docker run -d -e OPENAI_API_KEY=<YOUR_API_KEY> -p 8000:80 forcemultiplier
+```
+5. Navigate to `localhost:8000` in a modern browser
