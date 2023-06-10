@@ -1,8 +1,10 @@
 import logging
+import os
 from types import SimpleNamespace
-
 import openai
 import json
+
+MOCK_COMPLETION = os.getenv("MOCK_COMPLETION", False)
 
 
 def apply_feedback(document, feedback):
@@ -64,9 +66,9 @@ def get_diff(document, feedback):
         }
     ]
 
-    completion = get_completion(messages)
-    # completion = get_mock_completion(document)
+    completion = get_mock_completion(document) if MOCK_COMPLETION else get_completion(messages)
     logging.info(completion)
+
     return json.loads(completion, object_hook=lambda d: SimpleNamespace(**d))
 
 
