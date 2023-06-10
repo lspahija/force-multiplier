@@ -1,5 +1,5 @@
 export const sendAudioData = (blob, currentDocument) => {
-    return fetch("http://localhost:8000/modify", {
+    return fetch("/modify", {
         method: "POST",
         body: createBody(blob),
         headers: {
