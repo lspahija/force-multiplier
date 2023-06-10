@@ -1,8 +1,8 @@
 import {Title, Text, createStyles, rem, Container, Loader, Divider} from '@mantine/core';
 import {useLocation} from "react-router-dom";
 import {useState} from "react";
-import {handleResponse, sendAudioData} from "./utils/api.ts";
-import {processAudio, useVoiceDetection} from "./utils/audio.ts";
+import {handleResponse, sendAudioData} from "../utils/api.ts";
+import {processAudio, useVoiceDetection} from "../utils/audio.ts";
 
 const useStyles = createStyles((theme) => ({
     inner: {

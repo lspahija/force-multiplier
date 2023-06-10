@@ -1,8 +1,8 @@
 import ReactDOM from 'react-dom/client'
 import {createBrowserRouter, RouterProvider,} from "react-router-dom";
-import {Hero} from "./Hero.tsx";
-import {Document} from "./Document.tsx";
-import {Feedback} from "./Feedback.tsx";
+import {Hero} from "./components/Hero.tsx";
+import {Document} from "./components/Document.tsx";
+import {Feedback} from "./components/Feedback.tsx";
 
 const router = createBrowserRouter([
     {
