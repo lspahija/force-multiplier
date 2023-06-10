@@ -1,7 +1,9 @@
 import {Title, Text, createStyles, rem, Container, Loader, Divider} from '@mantine/core';
 import {useLocation} from "react-router-dom";
 import {useState} from "react";
-import {useMicVAD, utils} from "@ricky0123/vad-react";
+import {useMicVAD} from "@ricky0123/vad-react";
+import {handleResponse, sendAudioData} from "./utils/api.ts";
+import {processAudio} from "./utils/audio.ts";
 
 const useStyles = createStyles((theme) => ({
     inner: {
@@ -49,7 +51,8 @@ export function Feedback() {
         onSpeechEnd: async (audio) => {
             console.log("speech ended")
             setIsSpeaking(false)
-            await processAudio(audio);
+            const audioBlob = await processAudio(audio);
+            sendData(audioBlob);
         },
         onVADMisfire: () => {
             console.log("VAD misfire")
@@ -57,57 +60,12 @@ export function Feedback() {
         },
     });
 
-    const createAudioBlob = (audio) => {
-        const wavBuffer = utils.encodeWAV(audio);
-        return new Blob([wavBuffer], {type: 'audio/wav'});
-    };
-
-    const validate = async (data) => {
-        const decodedData = await new AudioContext().decodeAudioData(await data.arrayBuffer());
-        const duration = decodedData.duration;
-        const minDuration = 0.4;
-
-        if (duration < minDuration) throw new Error(`Duration is ${duration}s, which is less than minimum of ${minDuration}s`);
-    };
-
-    const createBody = (data) => {
-        const formData = new FormData();
-        formData.append("audio", data, "audio.wav");
-        return formData;
-    };
-
-    const processAudio = async (audio) => {
-        const blob = createAudioBlob(audio);
-        await validate(blob);
-        sendData(blob);
-    };
-
     const sendData = (blob) => {
         setIsProcessing(true);
-        sendAudioData(blob)
-    };
-
-    const sendAudioData = (blob) => {
-        return fetch("http://localhost:8000/modify", {
-            method: "POST",
-            body: createBody(blob),
-            headers: {
-                'document': currentDocument
-            }
-        })
+        sendAudioData(blob, document)
             .then(handleResponse)
             .then(handleSuccess)
             .catch(handleError);
-    };
-
-    const handleResponse = (res) => {
-        if (!res.ok) {
-            return res.text().then(error => {
-                throw new Error(error);
-            });
-        }
-
-        return res.json();
     };
 
     const handleSuccess = (data) => {
@@ -148,7 +106,7 @@ export function Feedback() {
             </Container>
             {feedback &&
                 <>
-                    <Divider my="sm" variant="dashed" />
+                    <Divider my="sm" variant="dashed"/>
                     <Title
                         order={2}
                         size="h4"
@@ -162,7 +120,7 @@ export function Feedback() {
                     <Text fz="md" align={"justify"} className={classes.paddingBoth}>{feedback}</Text>
                 </>
             }
-            <Divider my="sm" variant="dashed" />
+            <Divider my="sm" variant="dashed"/>
             <Title
                 order={2}
                 size="h4"
