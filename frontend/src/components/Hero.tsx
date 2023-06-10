@@ -76,10 +76,9 @@ export function Hero() {
                 <Container size={700} className={classes.inner}>
                     <h1 className={classes.title}>
                         Feedback is{' '}
-                        <Text component="span" variant="gradient" gradient={{from: 'blue', to: 'cyan'}} inherit>
-                            all
-                        </Text>{' '}
-                        you need
+                        <Text component="span" variant="gradient" gradient={{from: 'red', to: 'indigo'}} inherit>
+                            all you need
+                        </Text>
                     </h1>
 
                     <Text className={classes.description} color="dimmed">
@@ -93,8 +92,6 @@ export function Hero() {
                             <Button
                                 size="xl"
                                 className={classes.control}
-                                variant="gradient"
-                                gradient={{from: 'blue', to: 'cyan'}}
                             >
                                 Get started
                             </Button>

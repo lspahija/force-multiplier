@@ -80,8 +80,7 @@ export function Feedback() {
             <Container size={700} className={classes.inner}>
                 {!isSpeaking && !isProcessing && <>
                     <Title
-                        variant="gradient"
-                        gradient={{from: 'indigo', to: 'cyan', deg: 45}}
+                        color={"indigo"}
                         order={1}
                         size="h1"
                         sx={(theme) => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}

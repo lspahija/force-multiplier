@@ -3,6 +3,7 @@ import {createBrowserRouter, RouterProvider,} from "react-router-dom";
 import {Hero} from "./components/Hero.tsx";
 import {Document} from "./components/Document.tsx";
 import {Feedback} from "./components/Feedback.tsx";
+import {MantineProvider} from "@mantine/core";
 
 const router = createBrowserRouter([
     {
@@ -20,5 +21,10 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-    <RouterProvider router={router}/>
+    <MantineProvider theme={{
+        primaryColor: 'indigo',
+        primaryShade: 7
+    }}>
+        <RouterProvider router={router}/>
+    </MantineProvider>
 )
