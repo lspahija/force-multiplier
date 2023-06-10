@@ -1,5 +1,4 @@
-import { createStyles, Header, Container, rem } from '@mantine/core';
-import { MantineLogo } from '@mantine/ds';
+import { createStyles, Header, Container, rem, Text } from '@mantine/core';
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -38,7 +37,7 @@ export function HeaderMenuColored() {
     <Header height={56} className={classes.header} >
       <Container>
         <div className={classes.inner}>
-          <MantineLogo size={28} inverted />
+          <Text fz="xl" fw={700} color={"white"}>Force Multiplier</Text>
         </div>
       </Container>
     </Header>

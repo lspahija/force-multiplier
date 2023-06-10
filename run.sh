@@ -26,10 +26,14 @@ build_docker() {
 }
 
 run_docker() {
-    docker run -d -e OPENAI_API_KEY=${OPENAI_API_KEY} -p 8000:80 --label "$CONTAINER_LABEL" forcemultiplier
+    if [ "$1" == "MOCK" ]; then
+        docker run -d -e OPENAI_API_KEY=${OPENAI_API_KEY} -e MOCK_COMPLETION=true -p 8000:80 --label "$CONTAINER_LABEL" forcemultiplier
+    else
+        docker run -d -e OPENAI_API_KEY=${OPENAI_API_KEY} -e MOCK_COMPLETION=false -p 8000:80 --label "$CONTAINER_LABEL" forcemultiplier
+    fi
 }
 
 check_env_var "OPENAI_API_KEY"
 remove_containers "$CONTAINER_LABEL"
 build_docker
-run_docker
+run_docker "$1"

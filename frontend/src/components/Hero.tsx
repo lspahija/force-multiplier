@@ -70,36 +70,38 @@ export function Hero() {
     const {classes} = useStyles();
 
     return (
-        <div className={classes.wrapper}>
-            <HeaderMenuColored />
-            <Container size={700} className={classes.inner}>
-                <h1 className={classes.title}>
-                    Feedback is{' '}
-                    <Text component="span" variant="gradient" gradient={{from: 'blue', to: 'cyan'}} inherit>
-                        all
-                    </Text>{' '}
-                    you need
-                </h1>
+        <>
+            <HeaderMenuColored/>
+            <div className={classes.wrapper}>
+                <Container size={700} className={classes.inner}>
+                    <h1 className={classes.title}>
+                        Feedback is{' '}
+                        <Text component="span" variant="gradient" gradient={{from: 'blue', to: 'cyan'}} inherit>
+                            all
+                        </Text>{' '}
+                        you need
+                    </h1>
 
-                <Text className={classes.description} color="dimmed">
-                    Enter a starting piece of text. It can be an essay, code, anything.
-                    Then, verbally describe the changes you want performed, and watch the AI do all the work.
-                    Rinse and repeat until satisfied.
-                </Text>
+                    <Text className={classes.description} color="dimmed">
+                        Enter a starting piece of text. It can be an essay, code, anything.
+                        Then, verbally describe the changes you want performed, and watch the AI do all the work.
+                        Rinse and repeat until satisfied.
+                    </Text>
 
-                <Group className={classes.controls}>
-                    <Link to={"/document"}>
-                        <Button
-                            size="xl"
-                            className={classes.control}
-                            variant="gradient"
-                            gradient={{from: 'blue', to: 'cyan'}}
-                        >
-                            Get started
-                        </Button>
-                    </Link>
-                </Group>
-            </Container>
-        </div>
+                    <Group className={classes.controls}>
+                        <Link to={"/document"}>
+                            <Button
+                                size="xl"
+                                className={classes.control}
+                                variant="gradient"
+                                gradient={{from: 'blue', to: 'cyan'}}
+                            >
+                                Get started
+                            </Button>
+                        </Link>
+                    </Group>
+                </Container>
+            </div>
+        </>
     );
 }
