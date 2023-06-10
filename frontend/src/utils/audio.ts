@@ -1,4 +1,5 @@
 import {useMicVAD, utils} from "@ricky0123/vad-react";
+import {useEffect, useRef} from "react";
 
 export const createAudioBlob = (audio) => {
     const wavBuffer = utils.encodeWAV(audio);
@@ -20,14 +21,26 @@ export const processAudio = async (audio) => {
 };
 
 export const useVoiceDetection = (
-    onSpeechStart, onSpeechEnd, onMisfire
-) => useMicVAD({
-    preSpeechPadFrames: 5,
-    positiveSpeechThreshold: 0.90,
-    negativeSpeechThreshold: 0.75,
-    minSpeechFrames: 4,
-    startOnLoad: true,
-    onSpeechStart,
-    onSpeechEnd,
-    onVADMisfire: onMisfire,
-});
+    onSpeechStart, onSpeechEnd, onMisfire, setIsListening
+) => {
+    const micVAD = useMicVAD({
+        preSpeechPadFrames: 5,
+        positiveSpeechThreshold: 0.90,
+        negativeSpeechThreshold: 0.75,
+        minSpeechFrames: 4,
+        startOnLoad: true,
+        onSpeechStart,
+        onSpeechEnd,
+        onVADMisfire: onMisfire,
+    });
+
+    const listeningRef = useRef(micVAD.listening);
+    useEffect(() => {
+        if (listeningRef.current !== micVAD.listening) {
+            setIsListening(micVAD.listening);
+            listeningRef.current = micVAD.listening;
+        }
+    });
+
+    return micVAD;
+}

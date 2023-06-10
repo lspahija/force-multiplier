@@ -1,4 +1,4 @@
-import {Title, Text, createStyles, rem, Container, Loader, Divider} from '@mantine/core';
+import {Title, Text, createStyles, rem, Container, Loader, Divider, Switch} from '@mantine/core';
 import {useLocation} from "react-router-dom";
 import {useState} from "react";
 import {handleResponse, sendAudioData} from "../utils/api.ts";
@@ -25,7 +25,12 @@ const useStyles = createStyles((theme) => ({
     },
     paddingTop: {
         paddingTop: rem(20),
-    }
+    },
+    button: {
+        display: 'flex',
+        justifyContent: 'center',
+        margin: `${rem(50)} auto`,
+    },
 }));
 
 export function Feedback() {
@@ -37,8 +42,9 @@ export function Feedback() {
     const [isSpeaking, setIsSpeaking] = useState(false)
     const [isProcessing, setIsProcessing] = useState(false)
     const [feedback, setFeedback] = useState<string | null>(null)
+    const [isListening, setIsListening] = useState(false)
 
-    useVoiceDetection(
+    const voiceDetector = useVoiceDetection(
         () => {
             console.log("speech started")
             setIsSpeaking(true)
@@ -52,7 +58,8 @@ export function Feedback() {
         () => {
             console.log("VAD misfire")
             setIsSpeaking(false)
-        }
+        },
+        setIsListening
     )
 
     const sendData = (blob) => {
@@ -127,7 +134,21 @@ export function Feedback() {
                 >
                     Your auto-updating text:
                 </Title>
-                <Text fz="md" align={"justify"} className={classes.paddingTop}>{currentDocument}</Text>
+                <Text fz="md" align={"justify"} className={classes.paddingBoth}>{currentDocument}</Text>
+                <Divider my="sm" variant="dashed"/>
+                <div className={classes.button}>
+                    <Switch
+                        checked={isListening}
+                        onChange={() => {
+                            if (isListening) {
+                                voiceDetector.pause();
+                            } else {
+                                voiceDetector.start();
+                            }
+                        }}
+                        label={isListening ? 'Listening' : 'Not Listening'}
+                    />
+                </div>
             </Container>
         </>
     );
