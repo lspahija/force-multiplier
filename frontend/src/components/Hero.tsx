@@ -1,5 +1,6 @@
 import {createStyles, Container, Text, Button, Group, rem} from '@mantine/core';
 import {Link} from "react-router-dom";
+import {HeaderMenuColored} from "./HeaderMenuColored.tsx";
 
 const useStyles = createStyles((theme) => ({
     wrapper: {
@@ -70,6 +71,7 @@ export function Hero() {
 
     return (
         <div className={classes.wrapper}>
+            <HeaderMenuColored />
             <Container size={700} className={classes.inner}>
                 <h1 className={classes.title}>
                     Feedback is{' '}

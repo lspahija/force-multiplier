@@ -3,6 +3,7 @@ import {useLocation} from "react-router-dom";
 import {useState} from "react";
 import {handleResponse, sendAudioData} from "../utils/api.ts";
 import {processAudio, useVoiceDetection} from "../utils/audio.ts";
+import {HeaderMenuColored} from "./HeaderMenuColored.tsx";
 
 const useStyles = createStyles((theme) => ({
     inner: {
@@ -74,58 +75,61 @@ export function Feedback() {
     };
 
     return (
-        <Container size={700} className={classes.inner}>
-            {!isSpeaking && !isProcessing && <>
-                <Title
-                    variant="gradient"
-                    gradient={{from: 'indigo', to: 'cyan', deg: 45}}
-                    order={1}
-                    size="h1"
-                    sx={(theme) => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
-                    weight={700}
-                    align="center"
-                >
-                    Provide Your Feedback
-                </Title>
-                <Text
-                    fz="sm"
-                    align={"center"}
-                    className={classes.paddingBottom}>(Yes, just talk and describe the changes you'd like to see)
-                </Text>
-            </>}
-
-            <Container size={50}>
-                {isSpeaking && <Loader size="xl" variant="bars"/>}
-                {isProcessing && <Loader size="xl"/>}
-            </Container>
-            {feedback &&
-                <>
-                    <Divider my="sm" variant="dashed"/>
+        <>
+            <HeaderMenuColored/>
+            <Container size={700} className={classes.inner}>
+                {!isSpeaking && !isProcessing && <>
                     <Title
-                        order={2}
-                        size="h4"
+                        variant="gradient"
+                        gradient={{from: 'indigo', to: 'cyan', deg: 45}}
+                        order={1}
+                        size="h1"
                         sx={(theme) => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
                         weight={700}
                         align="center"
-                        className={classes.paddingTop}
                     >
-                        Your last feedback:
+                        Provide Your Feedback
                     </Title>
-                    <Text fz="md" align={"justify"} className={classes.paddingBoth}>{feedback}</Text>
-                </>
-            }
-            <Divider my="sm" variant="dashed"/>
-            <Title
-                order={2}
-                size="h4"
-                sx={(theme) => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
-                weight={700}
-                align="center"
-                className={classes.paddingTop}
-            >
-                Your auto-updating text:
-            </Title>
-            <Text fz="md" align={"justify"} className={classes.paddingTop}>{currentDocument}</Text>
-        </Container>
+                    <Text
+                        fz="sm"
+                        align={"center"}
+                        className={classes.paddingBottom}>(Yes, just talk and describe the changes you'd like to see)
+                    </Text>
+                </>}
+
+                <Container size={50}>
+                    {isSpeaking && <Loader size="xl" variant="bars"/>}
+                    {isProcessing && <Loader size="xl"/>}
+                </Container>
+                {feedback &&
+                    <>
+                        <Divider my="sm" variant="dashed"/>
+                        <Title
+                            order={2}
+                            size="h4"
+                            sx={(theme) => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
+                            weight={700}
+                            align="center"
+                            className={classes.paddingTop}
+                        >
+                            Your last feedback:
+                        </Title>
+                        <Text fz="md" align={"justify"} className={classes.paddingBoth}>{feedback}</Text>
+                    </>
+                }
+                <Divider my="sm" variant="dashed"/>
+                <Title
+                    order={2}
+                    size="h4"
+                    sx={(theme) => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
+                    weight={700}
+                    align="center"
+                    className={classes.paddingTop}
+                >
+                    Your auto-updating text:
+                </Title>
+                <Text fz="md" align={"justify"} className={classes.paddingTop}>{currentDocument}</Text>
+            </Container>
+        </>
     );
 }

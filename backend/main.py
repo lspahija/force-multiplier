@@ -1,14 +1,16 @@
 import logging
+import os
 
 from fastapi import FastAPI, UploadFile, Header
 from pydantic import BaseModel
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi.responses import RedirectResponse
 from force_multiplier import apply_feedback
 from stt import transcribe
 
-app = FastAPI()
 logging.basicConfig(level=logging.INFO)
+app = FastAPI()
 
 origins = [
     "http://127.0.0.1",
@@ -43,3 +45,17 @@ async def modify_document(audio: UploadFile, document: str = Header(default=None
         "feedback": feedback,
         "modified_document": modified_document,
     }
+
+
+@app.get("/test")
+async def test():
+    return "hello world"
+
+
+@app.get("/")
+async def root():
+    return RedirectResponse(url="/index.html")
+
+
+if os.path.isdir("/app/frontend/dist"):
+    app.mount("/", StaticFiles(directory="/app/frontend/dist"), name="static")
