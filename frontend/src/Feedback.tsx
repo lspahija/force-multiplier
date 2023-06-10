@@ -148,7 +148,7 @@ export function Feedback() {
             </Container>
             {feedback &&
                 <>
-                    <Divider my="sm"/>
+                    <Divider my="sm" variant="dashed" />
                     <Title
                         order={2}
                         size="h4"
@@ -162,7 +162,7 @@ export function Feedback() {
                     <Text fz="md" className={classes.paddingBoth}>{feedback}</Text>
                 </>
             }
-            <Divider my="sm"/>
+            <Divider my="sm" variant="dashed" />
             <Title
                 order={2}
                 size="h4"

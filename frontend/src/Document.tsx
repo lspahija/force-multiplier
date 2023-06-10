@@ -49,7 +49,7 @@ export function Document() {
             />
             <Group position="center" mt="xl">
                 <Link to={"/feedback"} state={{document: document}}>
-                    <Button type="submit" size="md" onClick={() => console.log(document)}>
+                    <Button type="submit" size="md">
                         Submit
                     </Button>
                 </Link>
