@@ -118,22 +118,12 @@ export function Feedback() {
                             align="center"
                             className={classes.paddingTop}
                         >
-                            Your last feedback:
+                            Your feedback:
                         </Title>
-                        <Text fz="md" align={"justify"} className={classes.paddingBoth}>{feedback}</Text>
+                        <Text fz="md" align={"justify"} className={classes.paddingBottom}>{feedback}</Text>
                     </>
                 }
                 <Divider my="sm" variant="dashed"/>
-                <Title
-                    order={2}
-                    size="h4"
-                    sx={(theme) => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
-                    weight={700}
-                    align="center"
-                    className={classes.paddingTop}
-                >
-                    Your auto-updating text:
-                </Title>
                 <Text fz="md" align={"justify"} className={classes.paddingBoth}>{currentDocument}</Text>
                 <Divider my="sm" variant="dashed"/>
                 <div className={classes.button}>
