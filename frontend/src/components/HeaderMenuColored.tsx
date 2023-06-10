@@ -1,4 +1,6 @@
 import { createStyles, Header, Container, rem, Text } from '@mantine/core';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faBolt} from "@fortawesome/free-solid-svg-icons";
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -9,7 +11,6 @@ const useStyles = createStyles((theme) => ({
   inner: {
     height: rem(56),
     display: 'flex',
-    justifyContent: 'space-between',
     alignItems: 'center',
   },
 
@@ -37,6 +38,7 @@ export function HeaderMenuColored() {
     <Header height={56} className={classes.header} >
       <Container>
         <div className={classes.inner}>
+          <FontAwesomeIcon icon={faBolt} style={{color: "#ffffff", marginRight: "0.5rem"}}/>
           <Text fz="xl" fw={700} color={"white"}>Force Multiplier</Text>
         </div>
       </Container>
