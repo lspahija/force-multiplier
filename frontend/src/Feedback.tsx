@@ -159,7 +159,7 @@ export function Feedback() {
                     >
                         Your last feedback
                     </Title>
-                    <Text fz="md" className={classes.paddingBoth}>{feedback}</Text>
+                    <Text fz="md" align={"justify"} className={classes.paddingBoth}>{feedback}</Text>
                 </>
             }
             <Divider my="sm" variant="dashed" />
@@ -173,7 +173,7 @@ export function Feedback() {
             >
                 The newest version of your text
             </Title>
-            <Text fz="md" className={classes.paddingTop}>{currentDocument}</Text>
+            <Text fz="md" align={"justify"} className={classes.paddingTop}>{currentDocument}</Text>
         </Container>
     );
 }

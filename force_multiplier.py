@@ -64,8 +64,8 @@ def get_diff(document, feedback):
         }
     ]
 
-    # completion = get_completion(messages)
-    completion = get_mock_completion(document)
+    completion = get_completion(messages)
+    # completion = get_mock_completion(document)
     logging.info(completion)
     return json.loads(completion, object_hook=lambda d: SimpleNamespace(**d))
 
