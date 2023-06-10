@@ -1,9 +1,8 @@
 import {Title, Text, createStyles, rem, Container, Loader, Divider} from '@mantine/core';
 import {useLocation} from "react-router-dom";
 import {useState} from "react";
-import {useMicVAD} from "@ricky0123/vad-react";
 import {handleResponse, sendAudioData} from "./utils/api.ts";
-import {processAudio} from "./utils/audio.ts";
+import {processAudio, useVoiceDetection} from "./utils/audio.ts";
 
 const useStyles = createStyles((theme) => ({
     inner: {
@@ -38,27 +37,22 @@ export function Feedback() {
     const [isProcessing, setIsProcessing] = useState(false)
     const [feedback, setFeedback] = useState<string | null>(null)
 
-    useMicVAD({
-        preSpeechPadFrames: 5,
-        positiveSpeechThreshold: 0.90,
-        negativeSpeechThreshold: 0.75,
-        minSpeechFrames: 4,
-        startOnLoad: true,
-        onSpeechStart: () => {
+    useVoiceDetection(
+        () => {
             console.log("speech started")
             setIsSpeaking(true)
         },
-        onSpeechEnd: async (audio) => {
+        async (audio) => {
             console.log("speech ended")
             setIsSpeaking(false)
             const audioBlob = await processAudio(audio);
             sendData(audioBlob);
         },
-        onVADMisfire: () => {
+        () => {
             console.log("VAD misfire")
             setIsSpeaking(false)
-        },
-    });
+        }
+    )
 
     const sendData = (blob) => {
         setIsProcessing(true);

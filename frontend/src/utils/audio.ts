@@ -1,4 +1,4 @@
-import { utils } from "@ricky0123/vad-react";
+import {useMicVAD, utils} from "@ricky0123/vad-react";
 
 export const createAudioBlob = (audio) => {
     const wavBuffer = utils.encodeWAV(audio);
@@ -18,3 +18,16 @@ export const processAudio = async (audio) => {
     await validate(blob);
     return blob;
 };
+
+export const useVoiceDetection = (
+    onSpeechStart, onSpeechEnd, onMisfire
+) => useMicVAD({
+    preSpeechPadFrames: 5,
+    positiveSpeechThreshold: 0.90,
+    negativeSpeechThreshold: 0.75,
+    minSpeechFrames: 4,
+    startOnLoad: true,
+    onSpeechStart,
+    onSpeechEnd,
+    onVADMisfire: onMisfire,
+});
