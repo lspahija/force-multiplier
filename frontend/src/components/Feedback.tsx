@@ -1,5 +1,5 @@
 import {Title, Text, createStyles, rem, Container, Loader, Divider, Switch} from '@mantine/core';
-import {useLocation} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {useState} from "react";
 import {handleResponse, sendAudioData} from "../utils/api.ts";
 import {processAudio, useVoiceDetection} from "../utils/audio.ts";
@@ -41,6 +41,8 @@ const useStyles = createStyles((theme) => ({
 
 export function Feedback() {
     const {classes} = useStyles();
+
+    useBackAndRefresh()
 
     const location = useLocation()
     const {document} = location.state
@@ -148,4 +150,12 @@ export function Feedback() {
             </Container>
         </>
     );
+}
+
+function useBackAndRefresh() {
+    const navigate = useNavigate();
+    window.onpopstate = () => {
+        navigate("/document");
+        navigate(0)
+    }
 }
