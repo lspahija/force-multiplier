@@ -3,10 +3,16 @@ export const sendAudioData = (blob, currentDocument) => {
         method: "POST",
         body: createBody(blob),
         headers: {
-            'document': currentDocument
+            'document': base64Encode(currentDocument)
         }
     });
 };
+
+function base64Encode(str: string) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(str);
+    return window.btoa(String.fromCharCode(...new Uint8Array(data)));
+}
 
 export const createBody = (data) => {
     const formData = new FormData();

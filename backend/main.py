@@ -1,3 +1,4 @@
+import base64
 import logging
 import os
 
@@ -19,7 +20,10 @@ class DocumentFeedback(BaseModel):
 @app.post("/modify")
 async def modify_document(audio: UploadFile, document: str = Header(default=None)):
     feedback = await transcribe(audio)
-    modified_document = apply_feedback(document, feedback)
+    modified_document = apply_feedback(
+        base64.b64decode(document).decode('utf-8'),
+        feedback
+    )
 
     return {
         "feedback": feedback,
