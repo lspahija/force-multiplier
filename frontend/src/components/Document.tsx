@@ -51,8 +51,8 @@ export function Document() {
                     onChange={e => setDocument(e.currentTarget.value)}
                 />
                 <Group position="center" mt="xl">
-                    <Link to={"/feedback"} state={{document: document}}>
-                        <Button type="submit" size="md">
+                    <Link to={document.length === 0 ? "#" : "/feedback"} state={{document: document}}>
+                        <Button type="submit" disabled={document.length === 0} size="md">
                             Submit
                         </Button>
                     </Link>
