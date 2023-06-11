@@ -21,7 +21,13 @@ const useStyles = createStyles((theme) => ({
     },
     paddingBoth: {
         paddingTop: rem(20),
-        paddingBottom: rem(20)
+        paddingBottom: rem(20),
+        whiteSpace: 'pre-wrap'
+    },
+    currentDocument: {
+        paddingTop: rem(20),
+        paddingBottom: rem(20),
+        whiteSpace: 'pre-wrap'
     },
     paddingTop: {
         paddingTop: rem(20),
@@ -124,7 +130,7 @@ export function Feedback() {
                     </>
                 }
                 <Divider my="sm" variant="dashed"/>
-                <Text fz="md" align={"justify"} className={classes.paddingBoth}>{currentDocument}</Text>
+                <Text fz="md" align={"justify"} className={classes.currentDocument}>{currentDocument}</Text>
                 <Divider my="sm" variant="dashed"/>
                 <div className={classes.button}>
                     <Switch
