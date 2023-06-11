@@ -1,6 +1,6 @@
 import {Title, Text, createStyles, rem, Container, Loader, Divider, Switch} from '@mantine/core';
 import {useLocation, useNavigate} from "react-router-dom";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {handleResponse, sendAudioData} from "../utils/api.ts";
 import {processAudio, useVoiceDetection} from "../utils/audio.ts";
 import {HeaderMenuColored} from "./HeaderMenuColored.tsx";
@@ -51,6 +51,10 @@ export function Feedback() {
     const [isProcessing, setIsProcessing] = useState(false)
     const [feedback, setFeedback] = useState<string | null>(null)
     const [isListening, setIsListening] = useState(false)
+    const [backgroundColor, setBackgroundColor] = useState("initial");
+
+    useHighlightOnRefresh(setBackgroundColor, currentDocument)
+
 
     const voiceDetector = useVoiceDetection(
         () => {
@@ -132,17 +136,14 @@ export function Feedback() {
                     </>
                 }
                 <Divider my="sm" variant="dashed"/>
-                <Text fz="md" align={"justify"} className={classes.currentDocument}>{currentDocument}</Text>
+                <Text fz="md" align={"justify"} className={classes.currentDocument}
+                      style={{backgroundColor}}>{currentDocument}</Text>
                 <Divider my="sm" variant="dashed"/>
                 <div className={classes.button}>
                     <Switch
                         checked={isListening}
                         onChange={() => {
-                            if (isListening) {
-                                voiceDetector.pause();
-                            } else {
-                                voiceDetector.start();
-                            }
+                            if (isListening) voiceDetector.pause(); else voiceDetector.start();
                         }}
                         label={isListening ? 'Listening' : 'Not Listening'}
                     />
@@ -152,7 +153,18 @@ export function Feedback() {
     );
 }
 
-function useBackAndRefresh() {
+const useHighlightOnRefresh = (setBackgroundColor, currentDocument) => {
+    useEffect(() => {
+        setBackgroundColor('#ffe066');
+        const timer = setTimeout(() => {
+            setBackgroundColor('initial');
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [currentDocument, setBackgroundColor]);
+}
+
+const useBackAndRefresh = () => {
     const navigate = useNavigate();
     window.onpopstate = () => {
         navigate("/document");
