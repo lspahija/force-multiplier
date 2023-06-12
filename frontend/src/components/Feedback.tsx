@@ -1,125 +1,113 @@
-import {Title, Text, createStyles, rem, Container, Loader, Divider, Switch} from '@mantine/core';
+import {Title, Text, createStyles, rem, Container, Loader, Divider, Switch, Button} from '@mantine/core';
 import {useLocation, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {handleResponse, sendAudioData} from "../utils/api.ts";
-import {processAudio, useVoiceDetection} from "../utils/audio.ts";
-import {HeaderMenuColored} from "./HeaderMenuColored.tsx";
+import {handleResponse, sendAudioData} from "../utils/api";
+import {processAudio, useVoiceDetection} from "../utils/audio";
+import {HeaderMenuColored} from "./HeaderMenuColored";
+import {LiveError, LivePreview, LiveProvider} from "react-live";
 
 const useStyles = createStyles((theme) => ({
-    inner: {
+    container: {
         position: 'relative',
-        paddingTop: rem(200),
-        paddingBottom: rem(120),
+        padding: `${rem(80)} 0`,
 
         [theme.fn.smallerThan('sm')]: {
-            paddingBottom: rem(80),
-            paddingTop: rem(80),
+            padding: `${rem(40)} 0`,
         },
     },
-    paddingBottom: {
-        paddingBottom: rem(20)
-    },
-    paddingBoth: {
-        paddingTop: rem(20),
-        paddingBottom: rem(20),
+    textBlock: {
+        margin: `${rem(20)} 0`,
         whiteSpace: 'pre-wrap'
-    },
-    currentDocument: {
-        paddingTop: rem(20),
-        paddingBottom: rem(20),
-        whiteSpace: 'pre-wrap'
-    },
-    paddingTop: {
-        paddingTop: rem(20),
     },
     button: {
+        margin: `${rem(20)} 0`,
+    },
+    column: {
         display: 'flex',
-        justifyContent: 'center',
-        margin: `${rem(50)} auto`,
+        flexDirection: 'column',
+        alignItems: 'center',
     },
 }));
 
 export function Feedback() {
     const {classes} = useStyles();
-
-    useBackAndRefresh()
-
-    const location = useLocation()
-    const {document} = location.state
-    const [currentDocument, setCurrentDocument] = useState<string>(document)
-    const [isSpeaking, setIsSpeaking] = useState(false)
-    const [isProcessing, setIsProcessing] = useState(false)
-    const [feedback, setFeedback] = useState<string | null>(null)
-    const [isListening, setIsListening] = useState(false)
+    const location = useLocation();
+    const {document} = location.state;
+    const [currentDocument, setCurrentDocument] = useState<string>(document);
+    const [isSpeaking, setIsSpeaking] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [feedback, setFeedback] = useState<string | null>(null);
+    const [isListening, setIsListening] = useState(false);
     const [backgroundColor, setBackgroundColor] = useState("initial");
+    const [isRendering, setIsRendering] = useState(false);
 
-    useHighlightOnRefresh(setBackgroundColor, currentDocument)
-
-
+    useHighlightOnRefresh(setBackgroundColor, currentDocument);
+    useBackAndRefresh();
     const voiceDetector = useVoiceDetection(
         () => {
-            console.log("speech started")
-            setIsSpeaking(true)
+            console.log("speech started");
+            setIsSpeaking(true);
         },
         async (audio) => {
-            console.log("speech ended")
-            setIsSpeaking(false)
+            console.log("speech ended");
+            setIsSpeaking(false);
             const audioBlob = await processAudio(audio);
             sendData(audioBlob);
         },
         () => {
-            console.log("VAD misfire")
-            setIsSpeaking(false)
+            console.log("VAD misfire");
+            setIsSpeaking(false);
         },
         setIsListening
-    )
+    );
 
-    const sendData = (blob) => {
+    function sendData(blob) {
         setIsProcessing(true);
         sendAudioData(blob, currentDocument)
             .then(handleResponse)
-            .then(handleSuccess)
-            .catch(handleError);
-    };
-
-    const handleSuccess = (data) => {
-        setCurrentDocument(data.modified_document);
-        setFeedback(data.feedback);
-        setIsProcessing(false);
-    };
-
-    const handleError = (error) => {
-        console.log(`error encountered: ${error.message}`);
-        setIsProcessing(false);
-    };
+            .then(data => {
+                setCurrentDocument(data.modified_document);
+                setFeedback(data.feedback);
+                setIsProcessing(false);
+            })
+            .catch(error => {
+                console.log(`error encountered: ${error.message}`);
+                setIsProcessing(false);
+            });
+    }
 
     return (
         <>
             <HeaderMenuColored/>
-            <Container size={700} className={classes.inner}>
-                {!isSpeaking && !isProcessing && <>
-                    <Title
-                        color={"indigo"}
-                        order={1}
-                        size="h1"
-                        sx={(theme) => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
-                        weight={700}
-                        align="center"
-                    >
-                        Provide Your Feedback
-                    </Title>
-                    <Text
-                        fz="sm"
-                        align={"center"}
-                        className={classes.paddingBottom}>(Yes, just talk and describe the changes you'd like to see)
-                    </Text>
-                </>}
+            <Container size={700} className={classes.container}>
+                {!isSpeaking && !isProcessing && (
+                    <>
+                        <Title
+                            color={"indigo"}
+                            order={1}
+                            size="h1"
+                            sx={(theme) => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
+                            weight={700}
+                            align="center"
+                        >
+                            Provide Your Feedback
+                        </Title>
+                        <Text
+                            fz="sm"
+                            align={"center"}
+                            className={classes.textBlock}
+                        >
+                            (Yes, just talk and describe the changes you'd like to see)
+                        </Text>
+                    </>
+                )}
 
                 <Container size={50}>
                     {isSpeaking && <Loader size="xl" variant="bars"/>}
                     {isProcessing && <Loader size="xl"/>}
                 </Container>
-                {feedback &&
+
+                {feedback && (
                     <>
                         <Divider my="sm" variant="dashed"/>
                         <Title
@@ -128,32 +116,57 @@ export function Feedback() {
                             sx={(theme) => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
                             weight={700}
                             align="center"
-                            className={classes.paddingTop}
+                            className={classes.textBlock}
                         >
                             Your feedback:
                         </Title>
-                        <Text fz="md" align={"justify"} className={classes.paddingBottom}>{feedback}</Text>
+                        <Text fz="md" align={"justify"} className={classes.textBlock}>{feedback}</Text>
                     </>
-                }
+                )}
+
                 <Divider my="sm" variant="dashed"/>
-                <Text fz="md" align={"justify"} className={classes.currentDocument}
-                      style={{backgroundColor}}>{currentDocument}</Text>
+                <Text
+                    fz="md"
+                    align={"justify"}
+                    className={classes.textBlock}
+                    style={{backgroundColor}}
+                >
+                    {currentDocument}
+                </Text>
+
+                {isRendering && (
+                    <>
+                        <Divider my="sm" variant="dashed"/>
+                        <LiveProvider code={currentDocument}>
+                            <LiveError/>
+                            <LivePreview/>
+                        </LiveProvider>
+                    </>
+                )}
+
                 <Divider my="sm" variant="dashed"/>
-                <div className={classes.button}>
-                    <Switch
-                        checked={isListening}
-                        onChange={() => {
-                            if (isListening) voiceDetector.pause(); else voiceDetector.start();
-                        }}
-                        label={isListening ? 'Listening' : 'Not Listening'}
-                    />
+                <div className={classes.column}>
+                    <div className={classes.button}>
+                        <Button onClick={() => setIsRendering(prev => !prev)}>
+                            {isRendering ? 'Stop Rendering' : 'render React code'}
+                        </Button>
+                    </div>
+                    <div>
+                        <Switch
+                            checked={isListening}
+                            onChange={() => {
+                                if (isListening) voiceDetector.pause(); else voiceDetector.start();
+                            }}
+                            label={isListening ? 'Listening' : 'Not Listening'}
+                        />
+                    </div>
                 </div>
             </Container>
         </>
     );
 }
 
-const useHighlightOnRefresh = (setBackgroundColor, currentDocument) => {
+function useHighlightOnRefresh(setBackgroundColor, currentDocument) {
     useEffect(() => {
         setBackgroundColor('#ffe066');
         const timer = setTimeout(() => {
@@ -164,7 +177,7 @@ const useHighlightOnRefresh = (setBackgroundColor, currentDocument) => {
     }, [currentDocument, setBackgroundColor]);
 }
 
-const useBackAndRefresh = () => {
+function useBackAndRefresh() {
     const navigate = useNavigate();
     window.onpopstate = () => {
         navigate("/document");
