@@ -76,7 +76,7 @@ export function Feedback() {
 
     const sendData = (blob) => {
         setIsProcessing(true);
-        sendAudioData(blob, document)
+        sendAudioData(blob, currentDocument)
             .then(handleResponse)
             .then(handleSuccess)
             .catch(handleError);
