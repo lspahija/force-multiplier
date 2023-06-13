@@ -37,6 +37,7 @@ export function Feedback() {
         }, () => setIsSpeaking(false), setIsListening);
 
     function sendData(blob) {
+        voiceDetector.pause();
         setIsProcessing(true);
         sendAudioData(blob, currentDocument).then(handleResponse).then(data => {
             setDocumentHistory([...documentHistory.slice(0, currentDocumentIndex + 1), data.modified_document]);
@@ -44,11 +45,14 @@ export function Feedback() {
             setCurrentDocument(data.modified_document);
             setFeedback(data.feedback);
             setIsProcessing(false);
+            voiceDetector.start();
         }).catch(error => {
             console.log(`error encountered: ${error.message}`);
             setIsProcessing(false);
+            voiceDetector.start();
         });
     }
+
 
     const navigateBack = () => {
         if (currentDocumentIndex > 0) {
