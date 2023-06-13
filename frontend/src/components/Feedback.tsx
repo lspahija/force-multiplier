@@ -27,6 +27,12 @@ const useStyles = createStyles((theme) => ({
         flexDirection: 'column',
         alignItems: 'center',
     },
+    buttonGroup: {
+        display: 'flex',
+        justifyContent: 'center',
+        gap: rem(5),
+        marginTop: rem(20),
+    },
 }));
 
 export function Feedback() {
@@ -40,6 +46,8 @@ export function Feedback() {
     const [isListening, setIsListening] = useState(false);
     const [backgroundColor, setBackgroundColor] = useState("initial");
     const [isRendering, setIsRendering] = useState(false);
+    const [documentHistory, setDocumentHistory] = useState<string[]>([document]);
+    const [currentDocumentIndex, setCurrentDocumentIndex] = useState(0);
 
     useHighlightOnRefresh(setBackgroundColor, currentDocument);
     useBackAndRefresh();
@@ -66,6 +74,8 @@ export function Feedback() {
         sendAudioData(blob, currentDocument)
             .then(handleResponse)
             .then(data => {
+                setDocumentHistory([...documentHistory.slice(0, currentDocumentIndex + 1), data.modified_document]);
+                setCurrentDocumentIndex(prevIndex => prevIndex + 1);
                 setCurrentDocument(data.modified_document);
                 setFeedback(data.feedback);
                 setIsProcessing(false);
@@ -75,6 +85,20 @@ export function Feedback() {
                 setIsProcessing(false);
             });
     }
+
+    const navigateBack = () => {
+        if (currentDocumentIndex > 0) {
+            setCurrentDocumentIndex(prevIndex => prevIndex - 1);
+            setCurrentDocument(documentHistory[currentDocumentIndex - 1]);
+        }
+    };
+
+    const navigateForward = () => {
+        if (currentDocumentIndex < documentHistory.length - 1) {
+            setCurrentDocumentIndex(prevIndex => prevIndex + 1);
+            setCurrentDocument(documentHistory[currentDocumentIndex + 1]);
+        }
+    };
 
     return (
         <>
@@ -146,6 +170,15 @@ export function Feedback() {
 
                 <Divider my="sm" variant="dashed"/>
                 <div className={classes.column}>
+                    <div className={classes.buttonGroup}>
+                        <Button onClick={navigateBack} disabled={currentDocumentIndex === 0}>
+                            Back
+                        </Button>
+                        <Button onClick={navigateForward}
+                                disabled={currentDocumentIndex === documentHistory.length - 1}>
+                            Forward
+                        </Button>
+                    </div>
                     <div className={classes.button}>
                         <Button onClick={() => setIsRendering(prev => !prev)}>
                             {isRendering ? 'Stop Rendering' : 'render React code'}
