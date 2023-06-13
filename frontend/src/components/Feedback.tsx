@@ -30,11 +30,21 @@ export function Feedback() {
 
     useHighlightOnRefresh(setBackgroundColor, currentDocument);
     useBackAndRefresh();
-    const voiceDetector = useVoiceDetection(() => setIsSpeaking(true),
+    const voiceDetector = useVoiceDetection(
+        () => {
+            console.log("speech started")
+            setIsSpeaking(true)
+        },
         async audio => {
+            console.log("speech ended")
             setIsSpeaking(false);
             sendData(await processAudio(audio));
-        }, () => setIsSpeaking(false), setIsListening);
+        },
+        () => {
+            console.log("VAD misfire")
+            setIsSpeaking(false)
+        },
+        setIsListening)
 
     function sendData(blob) {
         voiceDetector.pause();
