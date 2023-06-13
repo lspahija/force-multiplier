@@ -131,7 +131,7 @@ export function Feedback() {
                 )}
                 <Divider my="sm" variant="dashed"/>
             </Container>
-            <Affix position={{bottom: rem(20), right: rem(20)}}>
+            <Affix position={{bottom: rem(50), right: rem(50)}}>
                 <Grid>
                     <Grid.Col span={12}>
                         <div className={classes.buttonGroup}>
