@@ -1,6 +1,18 @@
 import {useState, useEffect} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
-import {Title, Text, Container, Loader, Divider, Switch, Button, createStyles, rem} from '@mantine/core';
+import {
+    Title,
+    Text,
+    Container,
+    Loader,
+    Divider,
+    Switch,
+    Button,
+    createStyles,
+    rem,
+    Affix,
+    Grid
+} from '@mantine/core';
 import {processAudio, useVoiceDetection} from "../utils/audio";
 import {sendAudioData, handleResponse} from "../utils/api";
 import {LiveError, LivePreview, LiveProvider} from "react-live";
@@ -118,20 +130,24 @@ export function Feedback() {
                     </>
                 )}
                 <Divider my="sm" variant="dashed"/>
-                <div className={classes.column}>
-                    <div className={classes.buttonGroup}>
-                        <Button onClick={navigateBack} disabled={currentDocumentIndex === 0}>Back</Button>
-                        <Button onClick={navigateForward}
-                                disabled={currentDocumentIndex === documentHistory.length - 1}>Forward</Button>
-                    </div>
-                    <div className={classes.button}><Button
-                        onClick={() => setIsRendering(prev => !prev)}>{isRendering ? 'Stop Rendering' : 'render React code'}</Button>
-                    </div>
-                    <div><Switch checked={isListening} onChange={() => {
-                        if (isListening) voiceDetector.pause(); else voiceDetector.start();
-                    }} label={isListening ? 'Listening' : 'Not Listening'}/></div>
-                </div>
             </Container>
+            <Affix position={{bottom: rem(20), right: rem(20)}}>
+                <Grid>
+                    <Grid.Col span={12}>
+                        <div className={classes.buttonGroup}>
+                            <Button onClick={navigateBack} disabled={currentDocumentIndex === 0}>Back</Button>
+                            <Button onClick={navigateForward}
+                                    disabled={currentDocumentIndex === documentHistory.length - 1}>Forward</Button>
+                        </div>
+                        <div className={classes.button}><Button
+                            onClick={() => setIsRendering(prev => !prev)}>{isRendering ? 'Stop Rendering' : 'Render React code'}</Button>
+                        </div>
+                        <div><Switch checked={isListening} onChange={() => {
+                            if (isListening) voiceDetector.pause(); else voiceDetector.start();
+                        }} label={isListening ? 'Listening' : 'Not Listening'}/></div>
+                    </Grid.Col>
+                </Grid>
+            </Affix>
         </>
     );
 }
