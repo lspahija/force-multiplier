@@ -27,6 +27,10 @@ const useStyles = createStyles(theme => ({
             padding: `${rem(40)} 0`
         }
     },
+    subHeader: {
+        marginTop: rem(10),
+        marginBottom: rem(30),
+    },
     textBlock: {
         margin: `${rem(20)} 0`,
         whiteSpace: 'pre-wrap'
@@ -151,7 +155,7 @@ export function Feedback() {
                                align="center">
                             Provide Your Feedback
                         </Title>
-                        <Text fz="sm" align={"center"} className={classes.textBlock}>(Yes, just talk and describe the
+                        <Text fz="sm" align={"center"} className={classes.subHeader}>(Yes, just talk and describe the
                             changes you'd like to see)</Text>
                     </>
                 )}
@@ -179,7 +183,6 @@ export function Feedback() {
                         </LiveProvider>
                     </>
                 )}
-                <Divider my="sm" variant="dashed"/>
             </Container>
             <Affix position={{bottom: rem(50), right: rem(50)}}>
                 <Grid>
