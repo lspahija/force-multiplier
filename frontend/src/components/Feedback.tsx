@@ -17,13 +17,15 @@ import {processAudio, useVoiceDetection} from "../utils/audio";
 import {sendAudioData, handleResponse} from "../utils/api";
 import {LiveError, LivePreview, LiveProvider} from "react-live";
 import {HeaderMenuColored} from "./HeaderMenuColored";
+import {diffWordsWithSpace} from 'diff';
 
 const useStyles = createStyles(theme => ({
     container: {position: 'relative', padding: `${rem(80)} 0`, [theme.fn.smallerThan('sm')]: {padding: `${rem(40)} 0`}},
     textBlock: {margin: `${rem(20)} 0`, whiteSpace: 'pre-wrap'},
-    button: {margin: `${rem(20)} 0`},
+    button: {margin: `${rem(10)} 0`},
     column: {display: 'flex', flexDirection: 'column', alignItems: 'center'},
-    buttonGroup: {display: 'flex', justifyContent: 'center', gap: rem(5), marginTop: rem(20)}
+    buttonGroup: {display: 'flex', justifyContent: 'center', gap: rem(5), marginTop: rem(20)},
+    switchContainer: {marginBottom: `${rem(10)}`,},
 }));
 
 export function Feedback() {
@@ -39,6 +41,36 @@ export function Feedback() {
     const [isRendering, setIsRendering] = useState(false);
     const [documentHistory, setDocumentHistory] = useState([document]);
     const [currentDocumentIndex, setCurrentDocumentIndex] = useState(0);
+    const [highlightedDocument, setHighlightedDocument] = useState([]);
+    const [showDiffs, setShowDiffs] = useState(true);
+
+    useEffect(() => {
+        if (documentHistory.length > 1) {
+            const oldDocument = documentHistory[documentHistory.length - 2];
+            const diffResult = diffWordsWithSpace(oldDocument, currentDocument);
+            if (showDiffs) {
+                setHighlightedDocument(highlightDifferences(diffResult));
+            } else {
+                setHighlightedDocument(currentDocument);
+            }
+        } else {
+            setHighlightedDocument(currentDocument);
+        }
+    }, [currentDocument, showDiffs]);
+
+
+    const highlightDifferences = (diffResult) => {
+        return diffResult.map((part, index) => {
+            const color = part.added ? 'lightgreen' :
+                part.removed ? 'salmon' : 'transparent';
+            const spanStyle = {
+                backgroundColor: color,
+                textDecoration: part.removed ? 'line-through' : 'none'
+            };
+            return <span key={index} style={spanStyle}>{part.value}</span>;
+        });
+    }
+
 
     useHighlightOnRefresh(setBackgroundColor, currentDocument);
     useBackAndRefresh();
@@ -119,7 +151,7 @@ export function Feedback() {
                 )}
                 <Divider my="sm" variant="dashed"/>
                 <Text fz="md" align={"justify"} className={classes.textBlock}
-                      style={{backgroundColor}}>{currentDocument}</Text>
+                      style={{backgroundColor}}>{highlightedDocument}</Text>
                 {isRendering && (
                     <>
                         <Divider my="sm" variant="dashed"/>
@@ -142,9 +174,22 @@ export function Feedback() {
                         <div className={classes.button}><Button
                             onClick={() => setIsRendering(prev => !prev)}>{isRendering ? 'Stop Rendering' : 'Render React code'}</Button>
                         </div>
-                        <div><Switch checked={isListening} onChange={() => {
-                            if (isListening) voiceDetector.pause(); else voiceDetector.start();
-                        }} label={isListening ? 'Listening' : 'Not Listening'}/></div>
+                        <div className={classes.switchContainer}>
+                            <Switch
+                                checked={showDiffs}
+                                onChange={() => setShowDiffs(prev => !prev)}
+                                label={showDiffs ? 'Diffs' : 'No Diffs'}
+                            />
+                        </div>
+                        <div>
+                            <Switch
+                                checked={isListening}
+                                onChange={() => {
+                                    if (isListening) voiceDetector.pause(); else voiceDetector.start();
+                                }}
+                                label={isListening ? 'Listening' : 'Not Listening'}
+                            />
+                        </div>
                     </Grid.Col>
                 </Grid>
             </Affix>

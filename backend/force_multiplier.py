@@ -74,9 +74,10 @@ def get_diff(document, feedback):
 
 def get_completion(messages):
     return openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-4-0613",
         messages=messages,
-        timeout=15
+        timeout=15,
+        temperature=1
     )['choices'][0]['message']['content']
 
 
