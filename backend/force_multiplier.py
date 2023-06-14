@@ -84,7 +84,6 @@ def get_completion(messages):
         functions=[
             {
                 "name": "apply_diff",
-                "description": "This function replaces a document's text between the start and end tokens, inclusive, with the replacement. A comment is optionally included if it's absolutely necessary to explain the diff",
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -115,7 +114,6 @@ def get_completion(messages):
             },
             {
                 "name": "report_irrelevant_feedback",
-                "description": "This function allows the caller to report the reason that the feedback does not apply to the document",
                 "parameters": {
                     "type": "object",
                     "properties": {
