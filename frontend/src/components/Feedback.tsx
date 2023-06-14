@@ -65,18 +65,16 @@ export function Feedback() {
     const [showDiffs, setShowDiffs] = useState(true);
 
     useEffect(() => {
-        if (documentHistory.length > 1) {
-            const oldDocument = documentHistory[documentHistory.length - 2];
-            const diffResult = diffWordsWithSpace(oldDocument, currentDocument);
-            if (showDiffs) {
-                setHighlightedDocument(highlightDifferences(diffResult));
-            } else {
-                setHighlightedDocument(currentDocument);
-            }
-        } else {
+        if (currentDocumentIndex === 0) {
             setHighlightedDocument(currentDocument);
+            return;
         }
-    }, [currentDocument, showDiffs]);
+
+        const oldDocument = documentHistory[currentDocumentIndex - 1];
+        const diffResult = diffWordsWithSpace(oldDocument, currentDocument);
+        const highlightedDocument = showDiffs ? highlightDifferences(diffResult) : currentDocument;
+        setHighlightedDocument(highlightedDocument);
+    }, [currentDocument, showDiffs, currentDocumentIndex, documentHistory]);
 
 
     const highlightDifferences = (diffResult) => {
