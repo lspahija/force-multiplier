@@ -16,11 +16,11 @@ WORKDIR /
 
 ENV MAX_WORKERS=5
 
-RUN apt-get update && apt-get install -y ffmpeg
+RUN apt-get update && apt-get install -y ffmpeg curl git
 
 COPY ./backend/requirements.txt /tmp/
 
-RUN pip install --no-cache-dir --upgrade -r /tmp/requirements.txt
+RUN pip install -v --no-cache-dir --upgrade -r /tmp/requirements.txt
 
 COPY ./backend /app
 

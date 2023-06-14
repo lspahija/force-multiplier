@@ -5,3 +5,4 @@ pydantic~=1.10.9
 uvicorn~=0.22.0
 ffmpeg-python~=0.2.0
 python-multipart~=0.0.6
+git+https://github.com/aarnphm/whispercpp.git

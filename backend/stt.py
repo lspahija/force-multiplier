@@ -6,6 +6,9 @@ import uuid
 
 import ffmpeg
 import openai
+from whispercpp import Whisper
+
+w = Whisper.from_pretrained("base.en")
 
 LANGUAGE = os.getenv("LANGUAGE", "en")
 
@@ -34,10 +37,11 @@ async def transcribe(audio):
 
     delete_file(initial_filepath)
 
-    read_file = open(converted_filepath, "rb")
+    # read_file = open(converted_filepath, "rb")
 
     logging.debug("calling whisper")
-    transcription = (await openai.Audio.atranscribe("whisper-1", read_file, language=LANGUAGE))["text"]
+    # transcription = (await openai.Audio.atranscribe("whisper-1", read_file, language=LANGUAGE))["text"]
+    transcription = w.transcribe_from_file(converted_filepath)
     logging.info("STT response received from whisper in %s %s", time.time() - start_time, 'seconds')
     logging.info('user prompt: %s', transcription)
 
