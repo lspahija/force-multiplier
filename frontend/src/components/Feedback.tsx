@@ -20,12 +20,32 @@ import {HeaderMenuColored} from "./HeaderMenuColored";
 import {diffWordsWithSpace} from 'diff';
 
 const useStyles = createStyles(theme => ({
-    container: {position: 'relative', padding: `${rem(80)} 0`, [theme.fn.smallerThan('sm')]: {padding: `${rem(40)} 0`}},
-    textBlock: {margin: `${rem(20)} 0`, whiteSpace: 'pre-wrap'},
-    button: {margin: `${rem(10)} 0`},
-    column: {display: 'flex', flexDirection: 'column', alignItems: 'center'},
-    buttonGroup: {display: 'flex', justifyContent: 'center', gap: rem(5), marginTop: rem(20)},
-    switchContainer: {marginBottom: `${rem(10)}`,},
+    container: {
+        position: 'relative',
+        padding: `${rem(80)} 0`,
+        [theme.fn.smallerThan('sm')]: {
+            padding: `${rem(40)} 0`
+        }
+    },
+    textBlock: {
+        margin: `${rem(20)} 0`,
+        whiteSpace: 'pre-wrap'
+    },
+    column: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+    },
+    buttonGroup: {
+        display: 'flex',
+        justifyContent: 'flex-start',
+        gap: rem(5),
+        marginTop: rem(20),
+        marginBottom: rem(10)
+    },
+    switchContainer: {
+        margin: `${rem(5)} 0`
+    },
 }));
 
 export function Feedback() {
@@ -128,7 +148,7 @@ export function Feedback() {
             <Container size={700} className={classes.container}>
                 {!isSpeaking && !isProcessing && (
                     <>
-                        <Title color={"indigo"} order={1} size="h1"
+                        <Title color={"#3b5bdb"} order={1} size="h1"
                                sx={theme => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})} weight={700}
                                align="center">
                             Provide Your Feedback
@@ -171,24 +191,30 @@ export function Feedback() {
                             <Button onClick={navigateForward}
                                     disabled={currentDocumentIndex === documentHistory.length - 1}>Forward</Button>
                         </div>
-                        <div className={classes.button}><Button
-                            onClick={() => setIsRendering(prev => !prev)}>{isRendering ? 'Stop Rendering' : 'Render React code'}</Button>
-                        </div>
-                        <div className={classes.switchContainer}>
-                            <Switch
-                                checked={showDiffs}
-                                onChange={() => setShowDiffs(prev => !prev)}
-                                label={showDiffs ? 'Diffs' : 'No Diffs'}
-                            />
-                        </div>
-                        <div>
-                            <Switch
-                                checked={isListening}
-                                onChange={() => {
-                                    if (isListening) voiceDetector.pause(); else voiceDetector.start();
-                                }}
-                                label={isListening ? 'Listening' : 'Not Listening'}
-                            />
+                        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
+                            <div className={classes.switchContainer}>
+                                <Switch
+                                    checked={showDiffs}
+                                    onChange={() => setShowDiffs(prev => !prev)}
+                                    label={showDiffs ? 'Diffs' : 'No Diffs'}
+                                />
+                            </div>
+                            <div className={classes.switchContainer}>
+                                <Switch
+                                    checked={isListening}
+                                    onChange={() => {
+                                        if (isListening) voiceDetector.pause(); else voiceDetector.start();
+                                    }}
+                                    label={isListening ? 'Listening' : 'Not Listening'}
+                                />
+                            </div>
+                            <div className={classes.switchContainer}>
+                                <Switch
+                                    checked={isRendering}
+                                    onChange={() => setIsRendering(prev => !prev)}
+                                    label={isRendering ? 'Rendering React' : 'Not Rendering React'}
+                                />
+                            </div>
                         </div>
                     </Grid.Col>
                 </Grid>
