@@ -23,28 +23,31 @@ def get_diff(document, feedback):
     Here's an example:
 
     Given the document:
-        "Once upon a time in a small, quaint village nestled deep within a lush forest, there lived a young girl named Lily. She possessed a heart filled with curiosity and a mind eager for adventure. Lily had a secret hiding place in the hollow of an ancient oak tree, where she would spend countless hours reading books and imagining far-off lands."
+        "There was a girl named Lily. Lily had a hiding place."
 
     And the feedback:
         "Change the girl's name to Susy."
 
     I might suggest:
-    [
-        {
-            "start": "named",
-            "end": "Lily.",
-            "replacement": "named Susy."
-        },
-        {
-            "start": "Lily had",
-            "end": "a",
-            "replacement": "Susy had a"
-        }
-    ]
+    {
+        "diff": [
+            {
+                "start": "named",
+                "end": "Lily.",
+                "replacement": "named Susy."
+            },
+            {
+                "start": "Lily had",
+                "end": "a",
+                "replacement": "Susy had a"
+            }
+        ]
+        "comment": "I will include a comment here only if really necessary"
+    }
     
-    I will absolutely never respond with anything other than JSON.
-    
-    Each block of text to be replaced is represented as a JSON object with the keys 'start', 'end', and 'replacement'. If multiple blocks of text need to be replaced, I will return a list of such JSON objects.
+    I will strictly call the apply_diff function with my response as arguments. I will make no comments outside the "comment" field. 
+    If the feedback is completely irrelevant to the document, I will call the report_irrelevant_feedback function.
+    I will only ever call one of these two functions. I will not respond without calling one of these two functions, to guarantee that you can parse my response.
     """
 
     messages = [
@@ -73,12 +76,76 @@ def get_diff(document, feedback):
 
 
 def get_completion(messages):
-    return openai.ChatCompletion.create(
+    res = openai.ChatCompletion.create(
         model="gpt-4-0613",
         messages=messages,
         timeout=15,
-        temperature=1
-    )['choices'][0]['message']['content']
+        temperature=1,
+        functions=[
+            {
+                "name": "apply_diff",
+                "description": "This function replaces a document's text between the start and end tokens, inclusive, with the replacement. A comment is optionally included if it's absolutely necessary to explain the diff",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "diff": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "start": {
+                                        "type": "string"
+                                    },
+                                    "end": {
+                                        "type": "string"
+                                    },
+                                    "replacement": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": ["start", "end", "replacement"]
+                            }
+                        },
+                        "comment": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["diff"]
+                },
+            },
+            {
+                "name": "report_irrelevant_feedback",
+                "description": "This function allows the caller to report the reason that the feedback does not apply to the document",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "reason": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["reason"]
+                },
+            }
+        ]
+    ).choices[0]
+
+    try:
+        return process_result(res)
+    except InadequateFeedbackException as e:
+        print(str(e))
+        raise e
+
+
+def process_result(res):
+    if res.finish_reason != "function_call":
+        raise InadequateFeedbackException(res.message.content)
+
+    function_call = res.message.function_call
+
+    if function_call.name != "apply_diff":
+        raise InadequateFeedbackException(function_call.arguments)
+
+    return function_call.arguments
 
 
 def get_mock_completion(document):
@@ -99,7 +166,7 @@ def get_mock_completion(document):
 
 
 def apply_diff(document, diff):
-    for change in diff:
+    for change in diff.diff:
         start = change.start
         end = change.end
         replacement = change.replacement
@@ -113,3 +180,9 @@ def apply_diff(document, diff):
                 document = document[:block_start_index] + replacement + remaining_document[block_end_index:]
 
     return document
+
+
+class InadequateFeedbackException(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)

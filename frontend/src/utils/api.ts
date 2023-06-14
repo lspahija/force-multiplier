@@ -23,9 +23,10 @@ export const createBody = (data) => {
 export const handleResponse = (res) => {
     if (!res.ok) {
         return res.text().then(error => {
-            throw new Error(error);
+            throw new Error(JSON.parse(error).detail);
         });
     }
 
     return res.json();
 };
+
