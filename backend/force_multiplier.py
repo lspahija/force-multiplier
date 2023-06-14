@@ -49,14 +49,8 @@ def get_diff(document, feedback):
 
     messages = [
         {
-            "role": "system",
-            "content": system_prompt
-        },
-        {
             "role": "user",
             "content": f"""
-                Here is the document and my feedback:
-            
                 Document:
                 {document}
             
@@ -74,9 +68,56 @@ def get_diff(document, feedback):
 
 def get_completion(messages):
     return openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo-0613",
         messages=messages,
-        timeout=15
+        timeout=15,
+        functions=[
+            {
+                "name": "apply_diff",
+                "description": "For a given document and given feedback,",
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "start": {
+                                "type": "string"
+                            },
+                            "end": {
+                                "type": "string"
+                            },
+                            "replacement": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "start",
+                            "end",
+                            "replacement"
+                        ]
+                    },
+                },
+            },
+            {
+                "name": "add_hexadecimal_values",
+                "description": "Add two hexadecimal values",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "value1": {
+                            "type": "string",
+                            "description": "The first hexadecimal value to add. For example, 5",
+                        },
+                        "value2": {
+                            "type": "string",
+                            "description": "The second hexadecimal value to add. For example, A",
+                        },
+                    },
+                    "required": ["value1", "value2"],
+                },
+            },
+        ],
+        temperature=0
     )['choices'][0]['message']['content']
 
 
