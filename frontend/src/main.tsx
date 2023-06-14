@@ -23,7 +23,7 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <MantineProvider theme={{
         primaryColor: 'indigo',
-        primaryShade: 7
+        primaryShade: 8
     }}>
         <RouterProvider router={router}/>
     </MantineProvider>
