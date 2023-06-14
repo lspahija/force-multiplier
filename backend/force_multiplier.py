@@ -45,8 +45,9 @@ def get_diff(document, feedback):
         "comment": "I will include a comment here only if really necessary"
     }
     
-    Each block of text to be replaced is represented as a JSON object with the keys 'start', 'end', and 'replacement'. If multiple blocks of text need to be replaced, I will return a list of such JSON objects.
-    If the feedback makes sense, I will return my response as arguments to the apply_diff function. If the feedback is irrelevant to the document, I will return my response as an argument to the report_irrelevant_feedback function.
+    I will strictly call the apply_diff function with my response as arguments. I will make no comments outside the "comment" field. 
+    If the feedback is completely irrelevant to the document, I will call the report_irrelevant_feedback function.
+    I will only ever call one of these two functions. I will not respond without calling one of these two functions, to guarantee that you can parse my response.
     """
 
     messages = [
@@ -114,7 +115,7 @@ def get_completion(messages):
             },
             {
                 "name": "report_irrelevant_feedback",
-                "description": "This function allows the caller to report the reason that the feedback does not apply to the document.",
+                "description": "This function allows the caller to report the reason that the feedback does not apply to the document",
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -130,19 +131,19 @@ def get_completion(messages):
 
     try:
         return process_result(res)
-    except Exception as e:
+    except InadequateFeedbackException as e:
         print(str(e))
         raise e
 
 
 def process_result(res):
     if res.finish_reason != "function_call":
-        raise Exception(res.message.content)
+        raise InadequateFeedbackException(res.message.content)
 
     function_call = res.message.function_call
 
     if function_call.name != "apply_diff":
-        raise Exception(function_call.arguments)
+        raise InadequateFeedbackException(function_call.arguments)
 
     return function_call.arguments
 
@@ -179,3 +180,9 @@ def apply_diff(document, diff):
                 document = document[:block_start_index] + replacement + remaining_document[block_end_index:]
 
     return document
+
+
+class InadequateFeedbackException(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)

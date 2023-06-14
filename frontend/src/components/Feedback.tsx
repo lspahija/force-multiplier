@@ -11,7 +11,8 @@ import {
     createStyles,
     rem,
     Affix,
-    Grid
+    Grid,
+    Notification
 } from '@mantine/core';
 import {processAudio, useVoiceDetection} from "../utils/audio";
 import {sendAudioData, handleResponse} from "../utils/api";
@@ -67,6 +68,7 @@ export function Feedback() {
     const [currentDocumentIndex, setCurrentDocumentIndex] = useState(0);
     const [highlightedDocument, setHighlightedDocument] = useState([]);
     const [showDiffs, setShowDiffs] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         if (currentDocumentIndex === 0) {
@@ -122,8 +124,10 @@ export function Feedback() {
             setFeedback(data.feedback);
             setIsProcessing(false);
             voiceDetector.start();
+            setError(null);
         }).catch(error => {
             console.log(`error encountered: ${error.message}`);
+            setError(error.message);
             setIsProcessing(false);
             voiceDetector.start();
         });
@@ -163,6 +167,13 @@ export function Feedback() {
                     {isSpeaking && <Loader size="xl" variant="bars"/>}
                     {isProcessing && <Loader size="xl"/>}
                 </Container>
+                {error &&
+                <Notification
+                    color="red"
+                    onClose={() => setError(null)}
+                >
+                    {error}
+                </Notification>}
                 {feedback && (
                     <>
                         <Divider my="sm" variant="dashed"/>
