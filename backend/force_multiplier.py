@@ -154,13 +154,16 @@ def get_mock_completion(document):
     last_word = words[-1]
 
     return f"""
-    [
+    {{
+        "diff": [
         {{
             "start": "{first_word}",
             "end": "{last_word}",
             "replacement": "This is a mocked replacement."
         }}
-    ]"""
+    ]
+    }}
+    """
 
 
 def apply_diff(document, diff):

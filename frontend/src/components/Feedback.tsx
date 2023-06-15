@@ -82,6 +82,11 @@ export function Feedback() {
         setHighlightedDocument(highlightedDocument);
     }, [currentDocument, showDiffs, currentDocumentIndex, documentHistory]);
 
+    const stopListening = () => {
+        voiceDetector.pause()
+        setIsSpeaking(false)
+        setIsListening(false)
+    }
 
     const highlightDifferences = (diffResult) => {
         return diffResult.map((part, index) => {
@@ -215,7 +220,7 @@ export function Feedback() {
                                 <Switch
                                     checked={isListening}
                                     onChange={() => {
-                                        if (isListening) voiceDetector.pause(); else voiceDetector.start();
+                                        if (isListening) stopListening(); else voiceDetector.start();
                                     }}
                                     label={isListening ? 'Listening' : 'Not Listening'}
                                 />
