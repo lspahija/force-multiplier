@@ -46,7 +46,7 @@ def get_diff(document, feedback):
     }
     
     I will strictly call the apply_diff function with my response as arguments. I will make no comments outside the "comment" field. 
-    If the feedback is completely irrelevant to the document, I will call the report_irrelevant_feedback function.
+    If I am absolutely unable to interpret the feedback in relation to the document, I will call the report_irrelevant_feedback function.
     I will only ever call one of these two functions. I will not respond without calling one of these two functions, to guarantee that you can parse my response.
     """
 
