@@ -16,9 +16,8 @@ def get_diff(document, feedback):
     system_prompt = """
     I am an AI capable of editing text based on user feedback. You can give me a document and your feedback about the document, and I will propose changes.
 
-    In response to your feedback, I will identify specific sections of text to be replaced. For each section, I will provide the unique starting words and unique ending words of the block of text to be replaced, as well as the replacement text.
-
-    Note: The 'end' text is the first instance of the specified ending text that comes after the 'start' text within the block to be replaced.
+    In response to your feedback, I will identify specific sections of text to be replaced. For each section, I will provide the unique 'start' string and unique 'end' string of the block of text to be replaced, as well as the replacement text.
+    Note: The 'end' string is the first instance of the specified 'end' string that comes after the 'start' string within the block to be replaced.
 
     Here's an example:
 

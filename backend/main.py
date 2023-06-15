@@ -31,7 +31,7 @@ async def modify_document(audio: UploadFile, document: str = Header(default=None
             "modified_document": modified_document,
         }
 
-    except Exception as e:
+    except InadequateFeedbackException as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
