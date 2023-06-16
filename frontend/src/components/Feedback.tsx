@@ -12,11 +12,11 @@ import {
     rem,
     Affix,
     Grid,
-    Notification
+    Notification, Textarea
 } from '@mantine/core';
 import {processAudio, useVoiceDetection} from "../utils/audio";
 import {sendAudioData, handleResponse} from "../utils/api";
-import {LiveError, LivePreview, LiveProvider} from "react-live";
+import {LiveEditor, LiveError, LivePreview, LiveProvider} from "react-live";
 import {HeaderMenuColored} from "./HeaderMenuColored";
 import {diffWordsWithSpace} from 'diff';
 
@@ -63,7 +63,7 @@ export function Feedback() {
     const [feedback, setFeedback] = useState(null);
     const [isListening, setIsListening] = useState(false);
     const [backgroundColor, setBackgroundColor] = useState("initial");
-    const [isRendering, setIsRendering] = useState(false);
+    const [isRenderingReact, setIsRenderingReact] = useState(false);
     const [documentHistory, setDocumentHistory] = useState([document]);
     const [currentDocumentIndex, setCurrentDocumentIndex] = useState(0);
     const [highlightedDocument, setHighlightedDocument] = useState([]);
@@ -78,9 +78,8 @@ export function Feedback() {
 
         const oldDocument = documentHistory[currentDocumentIndex - 1];
         const diffResult = diffWordsWithSpace(oldDocument, currentDocument);
-        const highlightedDocument = showDiffs ? highlightDifferences(diffResult) : currentDocument;
-        setHighlightedDocument(highlightedDocument);
-    }, [currentDocument, showDiffs, currentDocumentIndex, documentHistory]);
+        setHighlightedDocument(highlightDifferences(diffResult));
+    }, [currentDocument, currentDocumentIndex, documentHistory]);
 
     const stopListening = () => {
         voiceDetector.pause()
@@ -173,12 +172,12 @@ export function Feedback() {
                     {isProcessing && <Loader size="xl"/>}
                 </Container>
                 {error &&
-                <Notification
-                    color="red"
-                    onClose={() => setError(null)}
-                >
-                    {error}
-                </Notification>}
+                    <Notification
+                        color="red"
+                        onClose={() => setError(null)}
+                    >
+                        {error}
+                    </Notification>}
                 {feedback && (
                     <>
                         <Divider my="sm" variant="dashed"/>
@@ -187,18 +186,32 @@ export function Feedback() {
                         <Text fz="md" align={"justify"} className={classes.textBlock}>{feedback}</Text>
                     </>
                 )}
-                <Divider my="sm" variant="dashed"/>
-                <Text fz="md" align={"justify"} className={classes.textBlock}
-                      style={{backgroundColor}}>{highlightedDocument}</Text>
-                {isRendering && (
+                {!isRenderingReact && <>
+                    <Divider my="sm" variant="dashed"/>
+                    <Textarea
+                        mt="md"
+                        maxRows={10}
+                        minRows={5}
+                        autosize
+                        name="message"
+                        variant="filled"
+                        value={currentDocument}
+                        onChange={e => setCurrentDocument(e.currentTarget.value)}
+                    />
+                </>}
+                {isRenderingReact && (
                     <>
                         <Divider my="sm" variant="dashed"/>
                         <LiveProvider code={currentDocument}>
+                            <LiveEditor/>
                             <LiveError/>
                             <LivePreview/>
                         </LiveProvider>
                     </>
                 )}
+                {showDiffs && currentDocumentIndex !== 0 &&
+                    <Text fz="md" align={"justify"} className={classes.textBlock}
+                          style={{backgroundColor}}>{highlightedDocument}</Text>}
             </Container>
             <Affix position={{bottom: rem(50), right: rem(50)}}>
                 <Grid>
@@ -227,9 +240,9 @@ export function Feedback() {
                             </div>
                             <div className={classes.switchContainer}>
                                 <Switch
-                                    checked={isRendering}
-                                    onChange={() => setIsRendering(prev => !prev)}
-                                    label={isRendering ? 'Rendering React' : 'Not Rendering React'}
+                                    checked={isRenderingReact}
+                                    onChange={() => setIsRenderingReact(prev => !prev)}
+                                    label={isRenderingReact ? 'Rendering React' : 'Not Rendering React'}
                                 />
                             </div>
                         </div>
