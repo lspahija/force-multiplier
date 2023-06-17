@@ -1,19 +1,13 @@
 import {useState} from "react";
 import {useLocation} from "react-router-dom";
-import {
-    Text,
-    Container,
-    Loader,
-    createStyles,
-    rem,
-    Notification
-} from '@mantine/core';
+import {Container, createStyles, rem} from '@mantine/core';
 import {processAudio, useVoiceDetection} from "../util/audio";
 import {transcribeAudio, handleResponse, modifyDocument} from "../util/api";
 import {HeaderMenuColored} from "./HeaderMenuColored";
 import {diffWordsWithSpace} from 'diff';
 import {
-    useBackAndRefresh, useControlVoiceDetector,
+    useBackAndRefresh,
+    useControlVoiceDetector,
     useHighlightDiff,
     useHighlightOnRefresh
 } from "../util/customhooks.tsx";
@@ -22,6 +16,9 @@ import {FeedbackForm} from "./FeedbackForm.tsx";
 import {VoiceFeedback} from "./VoiceFeedback.tsx";
 import {CurrentDocumentDisplay} from "./CurrentDocumentDisplay.tsx";
 import {DocumentNavigationControls} from "./DocumentNavigationControls.tsx";
+import {ErrorNotification} from "./ErrorNotification.tsx";
+import {ProcessingLoaders} from "./ProcessingLoaders.tsx";
+import {DiffView} from "./DiffView.tsx";
 
 const useStyles = createStyles(theme => ({
     container: {
@@ -30,11 +27,7 @@ const useStyles = createStyles(theme => ({
         [theme.fn.smallerThan('sm')]: {
             padding: `${rem(40)} 0`
         }
-    },
-    textBlock: {
-        margin: `${rem(20)} 0`,
-        whiteSpace: 'pre-wrap'
-    },
+    }
 }));
 
 export function DocumentModification() {
@@ -122,7 +115,7 @@ export function DocumentModification() {
         setError(null);
     }
 
-    function handleError(error: any) {
+    function handleError(error) {
         if (error instanceof Error) {
             console.log(`error encountered: ${error.message}`);
             setError(error.message);
@@ -139,25 +132,15 @@ export function DocumentModification() {
             <HeaderMenuColored/>
             <Container size={700} className={classes.container}>
                 <TitleSection useVoice={useVoice} isSpeaking={isSpeaking} isProcessing={isProcessing}/>
-                <Container size={50}>
-                    {isSpeaking && <Loader size="xl" variant="bars"/>}
-                    {isProcessing && <Loader size="xl"/>}
-                </Container>
-                {error &&
-                    <Notification
-                        color="red"
-                        onClose={() => setError(null)}
-                    >
-                        {error}
-                    </Notification>}
+                <ProcessingLoaders isSpeaking={isSpeaking} isProcessing={isProcessing}/>
+                <ErrorNotification error={error} setError={setError}/>
                 <FeedbackForm useVoice={useVoice} isProcessing={isProcessing} sendTextFeedback={sendTextFeedback}/>
                 <VoiceFeedback feedback={feedback} useVoice={useVoice} feedbackBackgroundColor={feedbackBackgroundColor}
                                classes={classes}/>
                 <CurrentDocumentDisplay currentDocument={currentDocument} isProcessing={isProcessing}
                                         isRenderingReact={isRenderingReact} setCurrentDocument={setCurrentDocument}/>
-                {showDiffs && currentDocumentIndex !== 0 &&
-                    <Text fz="md" align={"justify"} className={classes.textBlock}
-                          style={{backgroundColor: diffBackgroundColor}}>{highlightedDocument}</Text>}
+                <DiffView showDiffs={showDiffs} currentDocumentIndex={currentDocumentIndex}
+                          highlightedDocument={highlightedDocument} diffBackgroundColor={diffBackgroundColor}/>
             </Container>
             <DocumentNavigationControls currentDocumentIndex={currentDocumentIndex} documentHistory={documentHistory}
                                         setShowDiffs={setShowDiffs} setIsRenderingReact={setIsRenderingReact}
@@ -166,7 +149,8 @@ export function DocumentModification() {
                                         setUseVoice={setUseVoice} showDiffs={showDiffs}
                                         isRenderingReact={isRenderingReact}
             />
-
         </>
     );
 }
+
+
