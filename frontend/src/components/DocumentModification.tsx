@@ -231,9 +231,9 @@ export function DocumentModification() {
                         {error}
                     </Notification>}
                 {!useVoice &&
-                    <form onSubmit={(e) => {
+                    <form onSubmit={async (e) => {
                         e.preventDefault();
-                        sendTextFeedback(feedback);
+                        await sendTextFeedback(feedback);
                     }}>
                         <Divider my="sm" variant="dashed" style={{marginTop: rem(30)}}/>
                         <Title order={2} size="h4" sx={theme => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
