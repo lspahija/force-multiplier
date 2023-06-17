@@ -198,11 +198,14 @@ export function Feedback() {
                         <Divider my="sm" variant="dashed"/>
                         <Title order={2} size="h4" sx={theme => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
                                weight={700} align="center" className={classes.textBlock}>Your feedback:</Title>
-                        <Text fz="md" align={"justify"} style={{backgroundColor: feedbackBackgroundColor}} className={classes.textBlock}>{feedback}</Text>
+                        <Text fz="md" align={"justify"} style={{backgroundColor: feedbackBackgroundColor}}
+                              className={classes.textBlock}>{feedback}</Text>
                     </>
                 )}
                 {!isRenderingReact && <>
                     <Divider my="sm" variant="dashed"/>
+                    <Title order={2} size="h4" sx={theme => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
+                           weight={700} align="center" className={classes.textBlock}>Current document:</Title>
                     <Textarea
                         mt="md"
                         maxRows={10}
@@ -218,6 +221,8 @@ export function Feedback() {
                 {isRenderingReact && (
                     <>
                         <Divider my="sm" variant="dashed"/>
+                        <Title order={2} size="h4" sx={theme => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
+                               weight={700} align="center" className={classes.textBlock}>Current code:</Title>
                         <LiveProvider code={currentDocument}>
                             <LiveEditor/>
                             <LiveError/>
