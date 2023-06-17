@@ -10,7 +10,7 @@ import {
     useControlVoiceDetector,
     useHighlightDiff,
     useHighlightOnRefresh
-} from "../util/customhooks.tsx";
+} from "../util/CustomHooks.tsx";
 import {TitleSection} from "./TitleSection.tsx";
 import {FeedbackForm} from "./FeedbackForm.tsx";
 import {VoiceFeedback} from "./VoiceFeedback.tsx";
