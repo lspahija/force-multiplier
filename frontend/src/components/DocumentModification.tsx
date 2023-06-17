@@ -236,15 +236,14 @@ export function DocumentModification() {
                         await sendTextFeedback(feedback);
                     }}>
                         <Divider my="sm" variant="dashed" style={{marginTop: rem(30)}}/>
-                        <Title order={2} size="h4" sx={theme => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
-                               weight={700} align="center" className={classes.textBlock}>Your feedback:</Title>
                         <Textarea
                             placeholder="Type your feedback here"
                             value={feedback}
                             onChange={e => setFeedback(e.currentTarget.value)}
                             disabled={isProcessing}
+                            style={{marginTop: rem(30)}}
                         />
-                        <div style={{textAlign: 'center', marginTop: rem(10)}}>
+                        <div style={{textAlign: 'center', marginTop: rem(20), marginBottom: rem(20)}}>
                             <Button type="submit" disabled={isProcessing}>Submit Feedback</Button>
                         </div>
                     </form>
@@ -280,7 +279,7 @@ export function DocumentModification() {
                         <Title order={2} size="h4" sx={theme => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
                                weight={700} align="center" className={classes.textBlock}>Current code:</Title>
                         <LiveProvider code={currentDocument}>
-                            <LiveEditor/>
+                            <LiveEditor disabled={isProcessing}/>
                             <LiveError/>
                             <LivePreview/>
                         </LiveProvider>
