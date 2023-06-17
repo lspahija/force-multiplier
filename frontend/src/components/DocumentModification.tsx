@@ -1,22 +1,15 @@
 import {useState} from "react";
 import {useLocation} from "react-router-dom";
 import {
-    Title,
     Text,
     Container,
     Loader,
-    Divider,
-    Switch,
-    Button,
     createStyles,
     rem,
-    Affix,
-    Grid,
-    Notification, Textarea
+    Notification
 } from '@mantine/core';
 import {processAudio, useVoiceDetection} from "../util/audio";
 import {transcribeAudio, handleResponse, modifyDocument} from "../util/api";
-import {LiveEditor, LiveError, LivePreview, LiveProvider} from "react-live";
 import {HeaderMenuColored} from "./HeaderMenuColored";
 import {diffWordsWithSpace} from 'diff';
 import {
@@ -24,10 +17,11 @@ import {
     useHighlightDiff,
     useHighlightOnRefresh
 } from "../util/customhooks.tsx";
-import {navigateBack, navigateForward} from "../util/navigation.ts";
 import {TitleSection} from "./TitleSection.tsx";
 import {FeedbackForm} from "./FeedbackForm.tsx";
 import {VoiceFeedback} from "./VoiceFeedback.tsx";
+import {CurrentDocumentDisplay} from "./CurrentDocumentDisplay.tsx";
+import {DocumentNavigationControls} from "./DocumentNavigationControls.tsx";
 
 const useStyles = createStyles(theme => ({
     container: {
@@ -37,28 +31,9 @@ const useStyles = createStyles(theme => ({
             padding: `${rem(40)} 0`
         }
     },
-    subHeader: {
-        marginTop: rem(10),
-        marginBottom: rem(30),
-    },
     textBlock: {
         margin: `${rem(20)} 0`,
         whiteSpace: 'pre-wrap'
-    },
-    column: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center'
-    },
-    buttonGroup: {
-        display: 'flex',
-        justifyContent: 'flex-start',
-        gap: rem(5),
-        marginTop: rem(20),
-        marginBottom: rem(10)
-    },
-    switchContainer: {
-        margin: `${rem(5)} 0`
     },
 }));
 
@@ -121,8 +96,7 @@ export function DocumentModification() {
             voiceDetector.pause();
             handleProcessingStart();
 
-            const transcriptionResponse = await transcribeAudio(blob);
-            const transcriptionData = await handleResponse(transcriptionResponse);
+            const transcriptionData = await handleResponse(await transcribeAudio(blob));
             setFeedback(transcriptionData.feedback);
 
             await handleModification(transcriptionData.feedback);
@@ -136,8 +110,7 @@ export function DocumentModification() {
     }
 
     async function handleModification(feedback: string) {
-        const modificationResponse = await modifyDocument(currentDocument, feedback);
-        const modificationData = await handleResponse(modificationResponse);
+        const modificationData = await handleResponse(await modifyDocument(currentDocument, feedback));
 
         setDocumentHistory([...documentHistory.slice(0, currentDocumentIndex + 1), modificationData.modified_document]);
         setCurrentDocumentIndex(prevIndex => prevIndex + 1);
@@ -180,78 +153,20 @@ export function DocumentModification() {
                 <FeedbackForm useVoice={useVoice} isProcessing={isProcessing} sendTextFeedback={sendTextFeedback}/>
                 <VoiceFeedback feedback={feedback} useVoice={useVoice} feedbackBackgroundColor={feedbackBackgroundColor}
                                classes={classes}/>
-                {!isRenderingReact && <>
-                    <Divider my="sm" variant="dashed"/>
-                    <Title order={2} size="h4" sx={theme => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
-                           weight={700} align="center" className={classes.textBlock}>Current document:</Title>
-                    <Textarea
-                        mt="md"
-                        maxRows={10}
-                        minRows={5}
-                        autosize
-                        name="message"
-                        variant="filled"
-                        value={currentDocument}
-                        onChange={e => setCurrentDocument(e.currentTarget.value)}
-                        disabled={isProcessing}
-                    />
-                </>}
-                {isRenderingReact && (
-                    <>
-                        <Divider my="sm" variant="dashed"/>
-                        <Title order={2} size="h4" sx={theme => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
-                               weight={700} align="center" className={classes.textBlock}>Current code:</Title>
-                        <LiveProvider code={currentDocument}>
-                            <LiveEditor disabled={isProcessing}/>
-                            <LiveError/>
-                            <LivePreview/>
-                        </LiveProvider>
-                    </>
-                )}
+                <CurrentDocumentDisplay currentDocument={currentDocument} isProcessing={isProcessing}
+                                        isRenderingReact={isRenderingReact} setCurrentDocument={setCurrentDocument}/>
                 {showDiffs && currentDocumentIndex !== 0 &&
                     <Text fz="md" align={"justify"} className={classes.textBlock}
                           style={{backgroundColor: diffBackgroundColor}}>{highlightedDocument}</Text>}
             </Container>
-            <Affix position={{bottom: rem(50), right: rem(50)}}>
-                <Grid>
-                    <Grid.Col span={12}>
-                        <div className={classes.buttonGroup}>
-                            <Button
-                                onClick={() => navigateBack(currentDocumentIndex, setCurrentDocumentIndex, setCurrentDocument, documentHistory)}
-                                disabled={currentDocumentIndex === 0}>Back</Button>
-                            <Button
-                                onClick={() => navigateForward(currentDocumentIndex, setCurrentDocumentIndex, setCurrentDocument, documentHistory)}
-                                disabled={currentDocumentIndex === documentHistory.length - 1}>Forward</Button>
-                        </div>
-                        <div className={classes.switchContainer}>
-                            <Switch
-                                checked={useVoice}
-                                onChange={() => setUseVoice(prev => !prev)}
-                                label={useVoice ? 'Voice' : 'Text'}
-                            />
-                        </div>
-                        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
-                            {
-                                currentDocumentIndex !== 0 &&
-                                <div className={classes.switchContainer}>
-                                    <Switch
-                                        checked={showDiffs}
-                                        onChange={() => setShowDiffs(prev => !prev)}
-                                        label={showDiffs ? 'Diffs' : 'No Diffs'}
-                                    />
-                                </div>
-                            }
-                            <div className={classes.switchContainer}>
-                                <Switch
-                                    checked={isRenderingReact}
-                                    onChange={() => setIsRenderingReact(prev => !prev)}
-                                    label={isRenderingReact ? 'Rendering React' : 'Not Rendering React'}
-                                />
-                            </div>
-                        </div>
-                    </Grid.Col>
-                </Grid>
-            </Affix>
+            <DocumentNavigationControls currentDocumentIndex={currentDocumentIndex} documentHistory={documentHistory}
+                                        setShowDiffs={setShowDiffs} setIsRenderingReact={setIsRenderingReact}
+                                        setCurrentDocumentIndex={setCurrentDocumentIndex}
+                                        setCurrentDocument={setCurrentDocument} useVoice={useVoice}
+                                        setUseVoice={setUseVoice} showDiffs={showDiffs}
+                                        isRenderingReact={isRenderingReact}
+            />
+
         </>
     );
 }
