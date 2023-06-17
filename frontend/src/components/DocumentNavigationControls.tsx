@@ -1,7 +1,6 @@
 import {Switch, Button, createStyles, rem, Grid, Affix} from '@mantine/core';
 import {navigateBack, navigateForward} from "../util/navigation.ts";
 
-// Add styles here
 const useStyles = createStyles(() => ({
     buttonGroup: {
         display: 'flex',
