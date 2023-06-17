@@ -60,8 +60,7 @@ export function Feedback() {
     const [currentDocument, setCurrentDocument] = useState(document);
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
-    const [feedback, setFeedback] = useState(null);
-    const [isListening, setIsListening] = useState(false);
+    const [feedback, setFeedback] = useState("");
     const [feedbackBackgroundColor, setFeedbackBackgroundColor] = useState("initial");
     const [diffBackgroundColor, setDiffBackgroundColor] = useState("initial");
     const [isRenderingReact, setIsRenderingReact] = useState(false);
@@ -69,6 +68,7 @@ export function Feedback() {
     const [currentDocumentIndex, setCurrentDocumentIndex] = useState(0);
     const [highlightedDocument, setHighlightedDocument] = useState([]);
     const [showDiffs, setShowDiffs] = useState(true);
+    const [useVoice, setUseVoice] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -81,12 +81,6 @@ export function Feedback() {
         const diffResult = diffWordsWithSpace(oldDocument, currentDocument);
         setHighlightedDocument(highlightDifferences(diffResult));
     }, [currentDocument, currentDocumentIndex, documentHistory]);
-
-    const stopListening = () => {
-        voiceDetector.pause()
-        setIsSpeaking(false)
-        setIsListening(false)
-    }
 
     const highlightDifferences = (diffResult) => {
         return diffResult.map((part, index) => {
@@ -106,21 +100,62 @@ export function Feedback() {
     useBackAndRefresh();
     const voiceDetector = useVoiceDetection(
         () => {
+            if (!useVoice) return;
             console.log("speech started")
             setIsSpeaking(true)
         },
         async audio => {
+            if (!useVoice) return;
             console.log("speech ended")
             setIsSpeaking(false);
-            await sendData(await processAudio(audio));
+            await sendAudio(await processAudio(audio));
         },
         () => {
+            if (!useVoice) return;
             console.log("VAD misfire")
             setIsSpeaking(false)
-        },
-        setIsListening)
+        })
 
-    async function sendData(blob) {
+
+    useEffect(() => {
+        const stopListening = () => {
+            voiceDetector.pause()
+            setIsSpeaking(false)
+        }
+
+        if (useVoice) voiceDetector.start();
+        else stopListening();
+    }, [useVoice]);
+
+    async function sendTextFeedback(feedbackText: string) {
+        try {
+            setIsProcessing(true);
+
+            setFeedback(feedbackText);
+
+            const modificationResponse = await modifyDocument(currentDocument, feedbackText);
+            const modificationData = await handleResponse(modificationResponse);
+
+            setDocumentHistory([...documentHistory.slice(0, currentDocumentIndex + 1), modificationData.modified_document]);
+            setCurrentDocumentIndex(prevIndex => prevIndex + 1);
+            setCurrentDocument(modificationData.modified_document);
+
+            setIsProcessing(false);
+            setError(null);
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log(`error encountered: ${error.message}`);
+                setError(error.message);
+            } else {
+                console.log(`error encountered: ${error}`);
+                setError(String(error));
+            }
+            setIsProcessing(false);
+        }
+    }
+
+
+    async function sendAudio(blob) {
         try {
             voiceDetector.pause();
             setIsProcessing(true);
@@ -145,7 +180,7 @@ export function Feedback() {
                 setError(error.message);
             } else {
                 console.log(`error encountered: ${error}`);
-                setError(String(error)); // Convert to string, because we don't know what it is.
+                setError(String(error));
             }
             setIsProcessing(false);
             voiceDetector.start();
@@ -178,8 +213,10 @@ export function Feedback() {
                                align="center">
                             Provide Your Feedback
                         </Title>
-                        <Text fz="sm" align={"center"} className={classes.subHeader}>(Yes, just talk and describe the
-                            changes you'd like to see)</Text>
+                        {useVoice &&
+                            <Text fz="sm" align={"center"} className={classes.subHeader}>(Yes, just talk and describe
+                                the
+                                changes you'd like to see)</Text>}
                     </>
                 )}
                 <Container size={50}>
@@ -193,7 +230,26 @@ export function Feedback() {
                     >
                         {error}
                     </Notification>}
-                {feedback && (
+                {!useVoice &&
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        sendTextFeedback(feedback);
+                    }}>
+                        <Divider my="sm" variant="dashed" style={{marginTop: rem(30)}}/>
+                        <Title order={2} size="h4" sx={theme => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
+                               weight={700} align="center" className={classes.textBlock}>Your feedback:</Title>
+                        <Textarea
+                            placeholder="Type your feedback here"
+                            value={feedback}
+                            onChange={e => setFeedback(e.currentTarget.value)}
+                            disabled={isProcessing}
+                        />
+                        <div style={{textAlign: 'center', marginTop: rem(10)}}>
+                            <Button type="submit" disabled={isProcessing}>Submit Feedback</Button>
+                        </div>
+                    </form>
+                }
+                {feedback && useVoice && (
                     <>
                         <Divider my="sm" variant="dashed"/>
                         <Title order={2} size="h4" sx={theme => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
@@ -242,21 +298,19 @@ export function Feedback() {
                             <Button onClick={navigateForward}
                                     disabled={currentDocumentIndex === documentHistory.length - 1}>Forward</Button>
                         </div>
+                        <div className={classes.switchContainer}>
+                            <Switch
+                                checked={useVoice}
+                                onChange={() => setUseVoice(prev => !prev)}
+                                label={useVoice ? 'Voice Feedback' : 'Text Feedback'}
+                            />
+                        </div>
                         <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
                             <div className={classes.switchContainer}>
                                 <Switch
                                     checked={showDiffs}
                                     onChange={() => setShowDiffs(prev => !prev)}
                                     label={showDiffs ? 'Diffs' : 'No Diffs'}
-                                />
-                            </div>
-                            <div className={classes.switchContainer}>
-                                <Switch
-                                    checked={isListening}
-                                    onChange={() => {
-                                        if (isListening) stopListening(); else voiceDetector.start();
-                                    }}
-                                    label={isListening ? 'Listening' : 'Not Listening'}
                                 />
                             </div>
                             <div className={classes.switchContainer}>
