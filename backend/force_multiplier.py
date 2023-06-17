@@ -222,6 +222,7 @@ def get_system_prompt(is_code):
     I will strictly call the apply_diff function with my response as arguments. I will make no comments outside the "comment" field. 
     If I am absolutely unable to interpret the feedback in relation to the document, I will call the report_irrelevant_feedback function.
     I will only ever call one of these two functions. I will not respond without calling one of these two functions, to guarantee that you can parse my response.
+    The 'start' and 'end' strings are inclusive in block of text that will be replaced. This means that if I want to insert text between two strings, my replacement text will start with the 'start' string and end with the 'end' string, which ensures that the 'start' and 'end' strings will not be removed.
     """
     else:
         return """
