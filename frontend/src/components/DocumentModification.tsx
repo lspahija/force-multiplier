@@ -302,17 +302,20 @@ export function DocumentModification() {
                             <Switch
                                 checked={useVoice}
                                 onChange={() => setUseVoice(prev => !prev)}
-                                label={useVoice ? 'Voice Feedback' : 'Text Feedback'}
+                                label={useVoice ? 'Voice' : 'Text'}
                             />
                         </div>
                         <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
-                            <div className={classes.switchContainer}>
-                                <Switch
-                                    checked={showDiffs}
-                                    onChange={() => setShowDiffs(prev => !prev)}
-                                    label={showDiffs ? 'Diffs' : 'No Diffs'}
-                                />
-                            </div>
+                            {
+                                currentDocumentIndex !== 0 &&
+                                <div className={classes.switchContainer}>
+                                    <Switch
+                                        checked={showDiffs}
+                                        onChange={() => setShowDiffs(prev => !prev)}
+                                        label={showDiffs ? 'Diffs' : 'No Diffs'}
+                                    />
+                                </div>
+                            }
                             <div className={classes.switchContainer}>
                                 <Switch
                                     checked={isRenderingReact}
