@@ -7,7 +7,7 @@ const useStyles = createStyles(() => ({
         justifyContent: 'flex-start',
         gap: rem(5),
         marginTop: rem(20),
-        marginBottom: rem(10)
+        marginBottom: rem(5)
     },
     switchContainer: {
         margin: `${rem(5)} 0`
@@ -25,22 +25,29 @@ export const DocumentNavigationControls = ({
         <Affix position={{bottom: rem(50), right: rem(50)}}>
             <Grid>
                 <Grid.Col span={12}>
-                    <div className={classes.buttonGroup}>
-                        <Button
-                            onClick={() => navigateBack(currentDocumentIndex, setCurrentDocumentIndex, setCurrentDocument, documentHistory)}
-                            disabled={currentDocumentIndex === 0}>Back</Button>
-                        <Button
-                            onClick={() => navigateForward(currentDocumentIndex, setCurrentDocumentIndex, setCurrentDocument, documentHistory)}
-                            disabled={currentDocumentIndex === documentHistory.length - 1}>Forward</Button>
-                    </div>
-                    <div className={classes.switchContainer}>
-                        <Switch
-                            checked={useVoice}
-                            onChange={() => setUseVoice(prev => !prev)}
-                            label={useVoice ? 'Voice' : 'Text'}
-                        />
-                    </div>
                     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
+                        <div className={classes.buttonGroup}>
+                            <Button
+                                onClick={() => navigateBack(currentDocumentIndex, setCurrentDocumentIndex, setCurrentDocument, documentHistory)}
+                                disabled={currentDocumentIndex === 0}>Back</Button>
+                            <Button
+                                onClick={() => navigateForward(currentDocumentIndex, setCurrentDocumentIndex, setCurrentDocument, documentHistory)}
+                                disabled={currentDocumentIndex === documentHistory.length - 1}>Forward</Button>
+                        </div>
+                        <div className={classes.switchContainer}>
+                            <Switch
+                                checked={useVoice}
+                                onChange={() => setUseVoice(prev => !prev)}
+                                label={useVoice ? 'Voice' : 'Text'}
+                            />
+                        </div>
+                        <div className={classes.switchContainer}>
+                            <Switch
+                                checked={isRenderingReact}
+                                onChange={() => setIsRenderingReact(prev => !prev)}
+                                label={isRenderingReact ? 'Rendering React' : 'Not Rendering React'}
+                            />
+                        </div>
                         {
                             currentDocumentIndex !== 0 &&
                             <div className={classes.switchContainer}>
@@ -51,13 +58,6 @@ export const DocumentNavigationControls = ({
                                 />
                             </div>
                         }
-                        <div className={classes.switchContainer}>
-                            <Switch
-                                checked={isRenderingReact}
-                                onChange={() => setIsRenderingReact(prev => !prev)}
-                                label={isRenderingReact ? 'Rendering React' : 'Not Rendering React'}
-                            />
-                        </div>
                     </div>
                 </Grid.Col>
             </Grid>
