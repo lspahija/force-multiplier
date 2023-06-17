@@ -15,6 +15,7 @@ app = FastAPI()
 
 class DocumentFeedback(BaseModel):
     document: str
+    document_is_code: bool
     feedback: str
 
 
@@ -29,8 +30,9 @@ async def transcribe(audio: UploadFile):
 async def modify_document(document_feedback: DocumentFeedback):
     try:
         modified_document = apply_feedback(
-            _decode(document_feedback.document),
-            _decode(document_feedback.feedback)
+            document=_decode(document_feedback.document),
+            document_is_code=document_feedback.document_is_code,
+            feedback=_decode(document_feedback.feedback)
         )
 
         return {

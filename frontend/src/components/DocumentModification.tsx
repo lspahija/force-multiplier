@@ -103,7 +103,7 @@ export function DocumentModification() {
     }
 
     async function handleModification(feedback: string) {
-        const modificationData = await handleResponse(await modifyDocument(currentDocument, feedback));
+        const modificationData = await handleResponse(await modifyDocument(currentDocument, isRenderingReact, feedback));
 
         setDocumentHistory([...documentHistory.slice(0, currentDocumentIndex + 1), modificationData.modified_document]);
         setCurrentDocumentIndex(prevIndex => prevIndex + 1);

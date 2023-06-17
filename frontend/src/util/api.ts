@@ -5,7 +5,7 @@ export const transcribeAudio = (blob) => {
     });
 };
 
-export const modifyDocument = (document, feedback) => {
+export const modifyDocument = (document, documentIsCode, feedback) => {
     return fetch("/modify", {
         method: "POST",
         headers: {
@@ -13,6 +13,7 @@ export const modifyDocument = (document, feedback) => {
         },
         body: JSON.stringify({
             document: base64Encode(document),
+            document_is_code: documentIsCode,
             feedback: base64Encode(feedback)
         })
     });
