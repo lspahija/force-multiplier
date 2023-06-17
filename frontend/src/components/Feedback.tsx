@@ -212,6 +212,7 @@ export function Feedback() {
                         variant="filled"
                         value={currentDocument}
                         onChange={e => setCurrentDocument(e.currentTarget.value)}
+                        disabled={isProcessing}
                     />
                 </>}
                 {isRenderingReact && (
