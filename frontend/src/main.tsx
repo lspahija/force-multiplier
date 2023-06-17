@@ -1,8 +1,8 @@
 import ReactDOM from 'react-dom/client'
 import {createBrowserRouter, RouterProvider,} from "react-router-dom";
 import {Hero} from "./components/Hero.tsx";
-import {Document} from "./components/Document.tsx";
-import {Feedback} from "./components/Feedback.tsx";
+import {InitialDocument} from "./components/InitialDocument.tsx";
+import {DocumentModification} from "./components/DocumentModification.tsx";
 import {MantineProvider} from "@mantine/core";
 
 const router = createBrowserRouter([
@@ -12,11 +12,11 @@ const router = createBrowserRouter([
     },
     {
         path: "document",
-        element: <Document/>,
+        element: <InitialDocument/>,
     },
     {
         path: "feedback",
-        element: <Feedback/>,
+        element: <DocumentModification/>,
     },
 ]);
 

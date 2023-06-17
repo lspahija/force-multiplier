@@ -53,7 +53,7 @@ const useStyles = createStyles(theme => ({
     },
 }));
 
-export function Feedback() {
+export function DocumentModification() {
     const {classes} = useStyles();
     const location = useLocation();
     const {document} = location.state;

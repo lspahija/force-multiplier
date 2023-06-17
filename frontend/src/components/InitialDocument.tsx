@@ -19,7 +19,7 @@ const useStyles = createStyles((theme) => ({
     },
 }));
 
-export function Document() {
+export function InitialDocument() {
     const {classes} = useStyles();
 
     const [document, setDocument] = useState<string>("");
