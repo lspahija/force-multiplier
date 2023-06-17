@@ -1,5 +1,5 @@
-import {useState, useEffect} from "react";
-import {useLocation, useNavigate} from "react-router-dom";
+import {useState} from "react";
+import {useLocation} from "react-router-dom";
 import {
     Title,
     Text,
@@ -14,11 +14,20 @@ import {
     Grid,
     Notification, Textarea
 } from '@mantine/core';
-import {processAudio, useVoiceDetection} from "../utils/audio";
-import {transcribeAudio, handleResponse, modifyDocument} from "../utils/api";
+import {processAudio, useVoiceDetection} from "../util/audio";
+import {transcribeAudio, handleResponse, modifyDocument} from "../util/api";
 import {LiveEditor, LiveError, LivePreview, LiveProvider} from "react-live";
 import {HeaderMenuColored} from "./HeaderMenuColored";
 import {diffWordsWithSpace} from 'diff';
+import {
+    useBackAndRefresh, useControlVoiceDetector,
+    useHighlightDiff,
+    useHighlightOnRefresh
+} from "../util/customhooks.tsx";
+import {navigateBack, navigateForward} from "../util/navigation.ts";
+import {TitleSection} from "./TitleSection.tsx";
+import {FeedbackForm} from "./FeedbackForm.tsx";
+import {VoiceFeedback} from "./VoiceFeedback.tsx";
 
 const useStyles = createStyles(theme => ({
     container: {
@@ -57,7 +66,7 @@ export function DocumentModification() {
     const {classes} = useStyles();
     const location = useLocation();
     const {document} = location.state;
-    const [currentDocument, setCurrentDocument] = useState(document);
+    const [currentDocument, setCurrentDocument] = useState<string>(document);
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [feedback, setFeedback] = useState("");
@@ -71,33 +80,11 @@ export function DocumentModification() {
     const [useVoice, setUseVoice] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (currentDocumentIndex === 0) {
-            setHighlightedDocument(currentDocument);
-            return;
-        }
-
-        const oldDocument = documentHistory[currentDocumentIndex - 1];
-        const diffResult = diffWordsWithSpace(oldDocument, currentDocument);
-        setHighlightedDocument(highlightDifferences(diffResult));
-    }, [currentDocument, currentDocumentIndex, documentHistory]);
-
-    const highlightDifferences = (diffResult) => {
-        return diffResult.map((part, index) => {
-            const color = part.added ? 'lightgreen' :
-                part.removed ? 'salmon' : 'transparent';
-            const spanStyle = {
-                backgroundColor: color,
-                textDecoration: part.removed ? 'line-through' : 'none'
-            };
-            return <span key={index} style={spanStyle}>{part.value}</span>;
-        });
-    }
-
-
+    useHighlightDiff(currentDocumentIndex, setHighlightedDocument, currentDocument, documentHistory, diffWordsWithSpace)
     useHighlightOnRefresh(setDiffBackgroundColor, currentDocument);
     useHighlightOnRefresh(setFeedbackBackgroundColor, feedback);
     useBackAndRefresh();
+
     const voiceDetector = useVoiceDetection(
         () => {
             if (!useVoice) return;
@@ -116,109 +103,69 @@ export function DocumentModification() {
             setIsSpeaking(false)
         })
 
-
-    useEffect(() => {
-        const stopListening = () => {
-            voiceDetector.pause()
-            setIsSpeaking(false)
-        }
-
-        if (useVoice) voiceDetector.start();
-        else stopListening();
-    }, [useVoice]);
+    useControlVoiceDetector(useVoice, voiceDetector, setIsSpeaking)
 
     async function sendTextFeedback(feedbackText: string) {
         try {
-            setIsProcessing(true);
-
+            handleProcessingStart();
             setFeedback(feedbackText);
-
-            const modificationResponse = await modifyDocument(currentDocument, feedbackText);
-            const modificationData = await handleResponse(modificationResponse);
-
-            setDocumentHistory([...documentHistory.slice(0, currentDocumentIndex + 1), modificationData.modified_document]);
-            setCurrentDocumentIndex(prevIndex => prevIndex + 1);
-            setCurrentDocument(modificationData.modified_document);
-
+            await handleModification(feedbackText);
             setIsProcessing(false);
-            setError(null);
         } catch (error) {
-            if (error instanceof Error) {
-                console.log(`error encountered: ${error.message}`);
-                setError(error.message);
-            } else {
-                console.log(`error encountered: ${error}`);
-                setError(String(error));
-            }
-            setIsProcessing(false);
+            handleError(error);
         }
     }
-
 
     async function sendAudio(blob) {
         try {
             voiceDetector.pause();
-            setIsProcessing(true);
+            handleProcessingStart();
 
             const transcriptionResponse = await transcribeAudio(blob);
             const transcriptionData = await handleResponse(transcriptionResponse);
             setFeedback(transcriptionData.feedback);
 
-            const modificationResponse = await modifyDocument(currentDocument, transcriptionData.feedback);
-            const modificationData = await handleResponse(modificationResponse);
-
-            setDocumentHistory([...documentHistory.slice(0, currentDocumentIndex + 1), modificationData.modified_document]);
-            setCurrentDocumentIndex(prevIndex => prevIndex + 1);
-            setCurrentDocument(modificationData.modified_document);
+            await handleModification(transcriptionData.feedback);
 
             setIsProcessing(false);
             voiceDetector.start();
-            setError(null);
         } catch (error) {
-            if (error instanceof Error) {
-                console.log(`error encountered: ${error.message}`);
-                setError(error.message);
-            } else {
-                console.log(`error encountered: ${error}`);
-                setError(String(error));
-            }
-            setIsProcessing(false);
+            handleError(error);
             voiceDetector.start();
         }
     }
 
+    async function handleModification(feedback: string) {
+        const modificationResponse = await modifyDocument(currentDocument, feedback);
+        const modificationData = await handleResponse(modificationResponse);
 
-    const navigateBack = () => {
-        if (currentDocumentIndex > 0) {
-            setCurrentDocumentIndex(prevIndex => prevIndex - 1);
-            setCurrentDocument(documentHistory[currentDocumentIndex - 1]);
-        }
-    };
+        setDocumentHistory([...documentHistory.slice(0, currentDocumentIndex + 1), modificationData.modified_document]);
+        setCurrentDocumentIndex(prevIndex => prevIndex + 1);
+        setCurrentDocument(modificationData.modified_document);
+    }
 
-    const navigateForward = () => {
-        if (currentDocumentIndex < documentHistory.length - 1) {
-            setCurrentDocumentIndex(prevIndex => prevIndex + 1);
-            setCurrentDocument(documentHistory[currentDocumentIndex + 1]);
+    function handleProcessingStart() {
+        setIsProcessing(true);
+        setError(null);
+    }
+
+    function handleError(error: any) {
+        if (error instanceof Error) {
+            console.log(`error encountered: ${error.message}`);
+            setError(error.message);
+        } else {
+            console.log(`error encountered: ${error}`);
+            setError(String(error));
         }
-    };
+        setIsProcessing(false);
+    }
+
 
     return (
         <>
             <HeaderMenuColored/>
             <Container size={700} className={classes.container}>
-                {!isSpeaking && !isProcessing && (
-                    <>
-                        <Title color={"#3b5bdb"} order={1} size="h1"
-                               sx={theme => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})} weight={700}
-                               align="center">
-                            Provide Your Feedback
-                        </Title>
-                        {useVoice &&
-                            <Text fz="sm" align={"center"} className={classes.subHeader}>(Yes, just talk and describe
-                                the
-                                changes you'd like to see)</Text>}
-                    </>
-                )}
+                <TitleSection useVoice={useVoice} isSpeaking={isSpeaking} isProcessing={isProcessing}/>
                 <Container size={50}>
                     {isSpeaking && <Loader size="xl" variant="bars"/>}
                     {isProcessing && <Loader size="xl"/>}
@@ -230,33 +177,9 @@ export function DocumentModification() {
                     >
                         {error}
                     </Notification>}
-                {!useVoice &&
-                    <form onSubmit={async (e) => {
-                        e.preventDefault();
-                        await sendTextFeedback(feedback);
-                    }}>
-                        <Divider my="sm" variant="dashed" style={{marginTop: rem(30)}}/>
-                        <Textarea
-                            placeholder="Type your feedback here"
-                            value={feedback}
-                            onChange={e => setFeedback(e.currentTarget.value)}
-                            disabled={isProcessing}
-                            style={{marginTop: rem(30)}}
-                        />
-                        <div style={{textAlign: 'center', marginTop: rem(20), marginBottom: rem(20)}}>
-                            <Button type="submit" disabled={isProcessing}>Submit Feedback</Button>
-                        </div>
-                    </form>
-                }
-                {feedback && useVoice && (
-                    <>
-                        <Divider my="sm" variant="dashed"/>
-                        <Title order={2} size="h4" sx={theme => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
-                               weight={700} align="center" className={classes.textBlock}>Your feedback:</Title>
-                        <Text fz="md" align={"justify"} style={{backgroundColor: feedbackBackgroundColor}}
-                              className={classes.textBlock}>{feedback}</Text>
-                    </>
-                )}
+                <FeedbackForm useVoice={useVoice} isProcessing={isProcessing} sendTextFeedback={sendTextFeedback}/>
+                <VoiceFeedback feedback={feedback} useVoice={useVoice} feedbackBackgroundColor={feedbackBackgroundColor}
+                               classes={classes}/>
                 {!isRenderingReact && <>
                     <Divider my="sm" variant="dashed"/>
                     <Title order={2} size="h4" sx={theme => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
@@ -293,9 +216,12 @@ export function DocumentModification() {
                 <Grid>
                     <Grid.Col span={12}>
                         <div className={classes.buttonGroup}>
-                            <Button onClick={navigateBack} disabled={currentDocumentIndex === 0}>Back</Button>
-                            <Button onClick={navigateForward}
-                                    disabled={currentDocumentIndex === documentHistory.length - 1}>Forward</Button>
+                            <Button
+                                onClick={() => navigateBack(currentDocumentIndex, setCurrentDocumentIndex, setCurrentDocument, documentHistory)}
+                                disabled={currentDocumentIndex === 0}>Back</Button>
+                            <Button
+                                onClick={() => navigateForward(currentDocumentIndex, setCurrentDocumentIndex, setCurrentDocument, documentHistory)}
+                                disabled={currentDocumentIndex === documentHistory.length - 1}>Forward</Button>
                         </div>
                         <div className={classes.switchContainer}>
                             <Switch
@@ -328,22 +254,4 @@ export function DocumentModification() {
             </Affix>
         </>
     );
-}
-
-function useHighlightOnRefresh(setBackgroundColor, text) {
-    useEffect(() => {
-        setBackgroundColor('#ffe066');
-        const timer = setTimeout(() => {
-            setBackgroundColor('initial');
-        }, 500);
-        return () => clearTimeout(timer);
-    }, [text, setBackgroundColor]);
-}
-
-function useBackAndRefresh() {
-    const navigate = useNavigate();
-    window.onpopstate = () => {
-        navigate("/document");
-        navigate(0);
-    }
 }
