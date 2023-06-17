@@ -2,11 +2,12 @@ import base64
 import logging
 import os
 
-from fastapi import FastAPI, UploadFile, Header, HTTPException
+from fastapi import FastAPI, UploadFile, HTTPException
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
+
+from backend import stt
 from force_multiplier import apply_feedback, InadequateFeedbackException
-from stt import transcribe
 
 logging.basicConfig(level=logging.INFO)
 app = FastAPI()
@@ -17,17 +18,22 @@ class DocumentFeedback(BaseModel):
     feedback: str
 
 
+@app.post("/transcribe")
+async def transcribe(audio: UploadFile):
+    return {
+        "feedback": await stt.transcribe(audio)
+    }
+
+
 @app.post("/modify")
-async def modify_document(audio: UploadFile, document: str = Header(default=None)):
+async def modify_document(document_feedback: DocumentFeedback):
     try:
-        feedback = await transcribe(audio)
         modified_document = apply_feedback(
-            base64.b64decode(document).decode('utf-8'),
-            feedback
+            _decode(document_feedback.document),
+            _decode(document_feedback.feedback)
         )
 
         return {
-            "feedback": feedback,
             "modified_document": modified_document,
         }
 
@@ -37,3 +43,7 @@ async def modify_document(audio: UploadFile, document: str = Header(default=None
 
 if os.path.isdir("/app/frontend/dist"):
     app.mount("/", StaticFiles(directory="/app/frontend/dist", html=True), name="static")
+
+
+def _decode(string: str) -> str:
+    return base64.b64decode(string).decode('utf-8')

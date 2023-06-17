@@ -1,12 +1,23 @@
-export const sendAudioData = (blob, currentDocument) => {
-    return fetch("/modify", {
+export const transcribeAudio = (blob) => {
+    return fetch("/transcribe", {
         method: "POST",
-        body: createBody(blob),
-        headers: {
-            'document': base64Encode(currentDocument)
-        }
+        body: createBody(blob)
     });
 };
+
+export const modifyDocument = (document, feedback) => {
+    return fetch("/modify", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            document: base64Encode(document),
+            feedback: base64Encode(feedback)
+        })
+    });
+};
+
 
 function base64Encode(str: string) {
     const encoder = new TextEncoder();

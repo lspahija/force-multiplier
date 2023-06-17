@@ -15,7 +15,7 @@ import {
     Notification, Textarea
 } from '@mantine/core';
 import {processAudio, useVoiceDetection} from "../utils/audio";
-import {sendAudioData, handleResponse} from "../utils/api";
+import {transcribeAudio, handleResponse, modifyDocument} from "../utils/api";
 import {LiveEditor, LiveError, LivePreview, LiveProvider} from "react-live";
 import {HeaderMenuColored} from "./HeaderMenuColored";
 import {diffWordsWithSpace} from 'diff';
@@ -62,13 +62,14 @@ export function Feedback() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [feedback, setFeedback] = useState(null);
     const [isListening, setIsListening] = useState(false);
-    const [backgroundColor, setBackgroundColor] = useState("initial");
+    const [feedbackBackgroundColor, setFeedbackBackgroundColor] = useState("initial");
+    const [diffBackgroundColor, setDiffBackgroundColor] = useState("initial");
     const [isRenderingReact, setIsRenderingReact] = useState(false);
     const [documentHistory, setDocumentHistory] = useState([document]);
     const [currentDocumentIndex, setCurrentDocumentIndex] = useState(0);
     const [highlightedDocument, setHighlightedDocument] = useState([]);
     const [showDiffs, setShowDiffs] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (currentDocumentIndex === 0) {
@@ -100,7 +101,8 @@ export function Feedback() {
     }
 
 
-    useHighlightOnRefresh(setBackgroundColor, currentDocument);
+    useHighlightOnRefresh(setDiffBackgroundColor, currentDocument);
+    useHighlightOnRefresh(setFeedbackBackgroundColor, feedback);
     useBackAndRefresh();
     const voiceDetector = useVoiceDetection(
         () => {
@@ -110,7 +112,7 @@ export function Feedback() {
         async audio => {
             console.log("speech ended")
             setIsSpeaking(false);
-            sendData(await processAudio(audio));
+            await sendData(await processAudio(audio));
         },
         () => {
             console.log("VAD misfire")
@@ -118,23 +120,36 @@ export function Feedback() {
         },
         setIsListening)
 
-    function sendData(blob) {
-        voiceDetector.pause();
-        setIsProcessing(true);
-        sendAudioData(blob, currentDocument).then(handleResponse).then(data => {
-            setDocumentHistory([...documentHistory.slice(0, currentDocumentIndex + 1), data.modified_document]);
+    async function sendData(blob) {
+        try {
+            voiceDetector.pause();
+            setIsProcessing(true);
+
+            const transcriptionResponse = await transcribeAudio(blob);
+            const transcriptionData = await handleResponse(transcriptionResponse);
+            setFeedback(transcriptionData.feedback);
+
+            const modificationResponse = await modifyDocument(currentDocument, transcriptionData.feedback);
+            const modificationData = await handleResponse(modificationResponse);
+
+            setDocumentHistory([...documentHistory.slice(0, currentDocumentIndex + 1), modificationData.modified_document]);
             setCurrentDocumentIndex(prevIndex => prevIndex + 1);
-            setCurrentDocument(data.modified_document);
-            setFeedback(data.feedback);
+            setCurrentDocument(modificationData.modified_document);
+
             setIsProcessing(false);
             voiceDetector.start();
             setError(null);
-        }).catch(error => {
-            console.log(`error encountered: ${error.message}`);
-            setError(error.message);
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log(`error encountered: ${error.message}`);
+                setError(error.message);
+            } else {
+                console.log(`error encountered: ${error}`);
+                setError(String(error)); // Convert to string, because we don't know what it is.
+            }
             setIsProcessing(false);
             voiceDetector.start();
-        });
+        }
     }
 
 
@@ -183,7 +198,7 @@ export function Feedback() {
                         <Divider my="sm" variant="dashed"/>
                         <Title order={2} size="h4" sx={theme => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
                                weight={700} align="center" className={classes.textBlock}>Your feedback:</Title>
-                        <Text fz="md" align={"justify"} className={classes.textBlock}>{feedback}</Text>
+                        <Text fz="md" align={"justify"} style={{backgroundColor: feedbackBackgroundColor}} className={classes.textBlock}>{feedback}</Text>
                     </>
                 )}
                 {!isRenderingReact && <>
@@ -211,7 +226,7 @@ export function Feedback() {
                 )}
                 {showDiffs && currentDocumentIndex !== 0 &&
                     <Text fz="md" align={"justify"} className={classes.textBlock}
-                          style={{backgroundColor}}>{highlightedDocument}</Text>}
+                          style={{backgroundColor: diffBackgroundColor}}>{highlightedDocument}</Text>}
             </Container>
             <Affix position={{bottom: rem(50), right: rem(50)}}>
                 <Grid>
@@ -253,14 +268,14 @@ export function Feedback() {
     );
 }
 
-function useHighlightOnRefresh(setBackgroundColor, currentDocument) {
+function useHighlightOnRefresh(setBackgroundColor, text) {
     useEffect(() => {
         setBackgroundColor('#ffe066');
         const timer = setTimeout(() => {
             setBackgroundColor('initial');
         }, 500);
         return () => clearTimeout(timer);
-    }, [currentDocument, setBackgroundColor]);
+    }, [text, setBackgroundColor]);
 }
 
 function useBackAndRefresh() {
