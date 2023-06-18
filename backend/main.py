@@ -3,6 +3,7 @@ import logging
 import os
 
 from fastapi import FastAPI, UploadFile, HTTPException, Header
+from openai.error import AuthenticationError
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
 
@@ -21,9 +22,12 @@ class DocumentFeedback(BaseModel):
 
 @app.post("/transcribe")
 async def transcribe(audio: UploadFile, openai_api_key: str = Header(...)):
-    return {
-        "feedback": await stt.transcribe(audio, openai_api_key)
-    }
+    try:
+        return {
+            "feedback": await stt.transcribe(audio, openai_api_key)
+        }
+    except AuthenticationError as e:
+        raise HTTPException(status_code=401, detail=type(e).__name__)
 
 
 @app.post("/modify")
@@ -42,6 +46,8 @@ async def modify_document(document_feedback: DocumentFeedback, openai_api_key: s
 
     except InadequateFeedbackException as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except AuthenticationError as e:
+        raise HTTPException(status_code=401, detail=type(e).__name__)
 
 
 if os.path.isdir("/app/frontend/dist"):
