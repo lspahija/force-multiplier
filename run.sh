@@ -3,13 +3,6 @@ set -e
 
 CONTAINER_LABEL="created_by=forcemultiplier_script"
 
-check_env_var() {
-    if [[ -z "${!1}" ]]; then
-        echo "Error: $1 is not set."
-        exit 1
-    fi
-}
-
 remove_containers() {
     if [ "$(docker ps -a -q -f "label=$1")" ]; then
         docker rm -f $(docker ps -a -q -f "label=$1")
@@ -33,7 +26,6 @@ run_docker() {
     fi
 }
 
-check_env_var "OPENAI_API_KEY"
 remove_containers "$CONTAINER_LABEL"
 build_docker
 run_docker "$1"

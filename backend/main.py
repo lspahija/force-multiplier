@@ -7,7 +7,7 @@ from openai.error import AuthenticationError
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
 
-from backend import stt
+from stt import transcribe
 from force_multiplier import apply_feedback, InadequateFeedbackException
 
 logging.basicConfig(level=logging.INFO)
@@ -21,10 +21,10 @@ class DocumentFeedback(BaseModel):
 
 
 @app.post("/transcribe")
-async def transcribe(audio: UploadFile, openai_api_key: str = Header(...)):
+async def transcribe_audio(audio: UploadFile, openai_api_key: str = Header(...)):
     try:
         return {
-            "feedback": await stt.transcribe(audio, openai_api_key)
+            "feedback": await transcribe(audio, openai_api_key)
         }
     except AuthenticationError as e:
         raise HTTPException(status_code=401, detail=type(e).__name__)
