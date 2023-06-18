@@ -14,7 +14,7 @@ def delete_file(filepath: str):
     os.remove(filepath)
 
 
-async def transcribe(audio):
+async def transcribe(audio, api_key):
     start_time = time.time()
     initial_filepath = f"/tmp/{uuid.uuid4()}{audio.filename}"
 
@@ -37,7 +37,8 @@ async def transcribe(audio):
     read_file = open(converted_filepath, "rb")
 
     logging.debug("calling whisper")
-    transcription = (await openai.Audio.atranscribe("whisper-1", read_file, language=LANGUAGE))["text"]
+    res = await openai.Audio.atranscribe(model="whisper-1", file=read_file, api_key=api_key, language=LANGUAGE)
+    transcription = res["text"]
     logging.info("STT response received from whisper in %s %s", time.time() - start_time, 'seconds')
     logging.info('user prompt: %s', transcription)
 

@@ -7,13 +7,13 @@ import json
 MOCK_COMPLETION = os.getenv("MOCK_COMPLETION", False)
 
 
-def apply_feedback(document, document_is_code, feedback):
-    diff = apply_diff(document=document,
-                      diff=get_diff(document=document, document_is_code=document_is_code, feedback=feedback))
-    return diff
+async def apply_feedback(document, document_is_code, feedback, api_key):
+    diff = await get_diff(document=document, document_is_code=document_is_code, feedback=feedback, api_key=api_key)
+    modified_document = apply_diff(document=document, diff=diff)
+    return modified_document
 
 
-def get_diff(document, document_is_code, feedback):
+async def get_diff(document, document_is_code, feedback, api_key):
     messages = [
         {
             "role": "system",
@@ -33,16 +33,17 @@ def get_diff(document, document_is_code, feedback):
         }
     ]
 
-    completion = get_mock_completion(document) if MOCK_COMPLETION else get_completion(messages)
+    completion = get_mock_completion(document) if MOCK_COMPLETION else await get_completion(messages, api_key)
     logging.info(completion)
 
     return json.loads(completion, object_hook=lambda d: SimpleNamespace(**d))
 
 
-def get_completion(messages):
-    res = openai.ChatCompletion.create(
+async def get_completion(messages, api_key):
+    res = await openai.ChatCompletion.acreate(
         model="gpt-4-0613",
         messages=messages,
+        api_key=api_key,
         timeout=15,
         temperature=1,
         functions=[
@@ -89,10 +90,12 @@ def get_completion(messages):
                 },
             }
         ]
-    ).choices[0]
+    )
+
+    first_choice = res.choices[0]
 
     try:
-        return process_result(res)
+        return process_result(first_choice)
     except InadequateFeedbackException as e:
         print(str(e))
         raise e

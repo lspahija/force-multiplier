@@ -1,30 +1,25 @@
 import prettier from "prettier/standalone";
 import parserBabel from "prettier/parser-babel";
-import { LiveEditor, LiveError, LivePreview, LiveProvider } from "react-live";
+import {LiveEditor, LiveError, LivePreview, LiveProvider} from "react-live";
 import {Divider, Textarea, Title} from '@mantine/core';
-import { createStyles, rem } from '@mantine/core';
+import {createStyles, rem} from '@mantine/core';
 
 const useStyles = createStyles(() => ({
     textBlock: {
         margin: `${rem(20)} 0`,
         whiteSpace: 'pre-wrap'
-    },
+    }
 }));
 
-export const CurrentDocumentDisplay = ({ currentDocument, isProcessing, isRenderingReact, setCurrentDocument }) => {
-    const { classes } = useStyles();
-
-    const formattedCode = prettier.format(currentDocument, {
-        parser: "babel",
-        plugins: [parserBabel],
-    });
+export const CurrentDocumentDisplay = ({currentDocument, isProcessing, isRenderingReact, setCurrentDocument}) => {
+    const {classes} = useStyles();
 
     return (
         <>
             {!isRenderingReact && <>
-                <Divider my="sm" variant="dashed" />
-                <Title order={2} size="h4" sx={theme => ({ fontFamily: `Greycliff CF, ${theme.fontFamily}` })}
-                    weight={700} align="center" className={classes.textBlock}>Current document:</Title>
+                <Divider my="sm" variant="dashed"/>
+                <Title size="h4" sx={theme => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
+                       weight={700} align="center" className={classes.textBlock}>Current document:</Title>
                 <Textarea
                     mt="md"
                     maxRows={10}
@@ -39,16 +34,28 @@ export const CurrentDocumentDisplay = ({ currentDocument, isProcessing, isRender
             </>}
             {isRenderingReact && (
                 <>
-                    <Divider my="sm" variant="dashed" />
-                    <Title order={2} size="h4" sx={theme => ({ fontFamily: `Greycliff CF, ${theme.fontFamily}` })}
-                        weight={700} align="center" className={classes.textBlock}>Current code:</Title>
-                    <LiveProvider code={formattedCode}>
-                        <LiveEditor disabled={isProcessing} />
-                        <LiveError />
-                        <LivePreview />
+                    <Divider my="sm" variant="dashed"/>
+                    <Title size="h4" sx={theme => ({fontFamily: `Greycliff CF, ${theme.fontFamily}`})}
+                           weight={700} align="center" className={classes.textBlock}>Current code:</Title>
+                    <LiveProvider code={formatCode(currentDocument)}>
+                        <LiveEditor disabled={isProcessing} onChange={code => setCurrentDocument(code)}/>
+                        <LiveError/>
+                        <LivePreview/>
                     </LiveProvider>
                 </>
             )}
         </>
     )
+}
+
+const formatCode = (currentDocument) => {
+    try {
+        return prettier.format(currentDocument, {
+            parser: "babel",
+            plugins: [parserBabel],
+        })
+    } catch (e) {
+        console.warn(e);
+        return currentDocument
+    }
 }

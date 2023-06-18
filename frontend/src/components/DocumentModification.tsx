@@ -19,6 +19,7 @@ import {DocumentNavigationControls} from "./DocumentNavigationControls.tsx";
 import {ErrorNotification} from "./ErrorNotification.tsx";
 import {ProcessingLoaders} from "./ProcessingLoaders.tsx";
 import {DiffView} from "./DiffView.tsx";
+import {ApiKeyModal} from "./ApiKeyModal.tsx";
 
 const useStyles = createStyles(theme => ({
     container: {
@@ -47,6 +48,8 @@ export function DocumentModification() {
     const [showDiffs, setShowDiffs] = useState(true);
     const [useVoice, setUseVoice] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [apiKey, setApiKey] = useState(import.meta.env.VITE_OPENAI_API_KEY_TEST);
 
     useHighlightDiff(currentDocumentIndex, setHighlightedDocument, currentDocument, documentHistory, diffWordsWithSpace)
     useHighlightOnRefresh(setDiffBackgroundColor, currentDocument);
@@ -73,7 +76,16 @@ export function DocumentModification() {
 
     useControlVoiceDetector(useVoice, voiceDetector, setIsSpeaking)
 
+    const handleApiKeyChange = (e) => setApiKey(e.currentTarget.value);
+
+    const handleModalClose = () => setIsModalOpen(false);
+
     async function sendTextFeedback(feedbackText: string) {
+        if (!apiKey) {
+            setIsModalOpen(true);
+            return;
+        }
+
         try {
             handleProcessingStart();
             setFeedback(feedbackText);
@@ -85,11 +97,16 @@ export function DocumentModification() {
     }
 
     async function sendAudio(blob) {
+        if (!apiKey) {
+            setIsModalOpen(true);
+            return;
+        }
+
         try {
             voiceDetector.pause();
             handleProcessingStart();
 
-            const transcriptionData = await handleResponse(await transcribeAudio(blob));
+            const transcriptionData = await handleResponse(await transcribeAudio(blob, apiKey));
             setFeedback(transcriptionData.feedback);
 
             await handleModification(transcriptionData.feedback);
@@ -103,7 +120,7 @@ export function DocumentModification() {
     }
 
     async function handleModification(feedback: string) {
-        const modificationData = await handleResponse(await modifyDocument(currentDocument, isRenderingReact, feedback));
+        const modificationData = await handleResponse(await modifyDocument(currentDocument, isRenderingReact, feedback, apiKey));
 
         setDocumentHistory([...documentHistory.slice(0, currentDocumentIndex + 1), modificationData.modified_document]);
         setCurrentDocumentIndex(prevIndex => prevIndex + 1);
@@ -129,8 +146,10 @@ export function DocumentModification() {
 
     return (
         <>
+            <ApiKeyModal isModalOpen={isModalOpen} handleModalClose={handleModalClose} apiKey={apiKey}
+                         handleApiKeyChange={handleApiKeyChange}/>
             <HeaderMenuColored/>
-            <Container size={700} className={classes.container}>
+            <Container size={600} className={classes.container}>
                 <TitleSection useVoice={useVoice} isSpeaking={isSpeaking} isProcessing={isProcessing}/>
                 <ProcessingLoaders isSpeaking={isSpeaking} isProcessing={isProcessing}/>
                 <ErrorNotification error={error} setError={setError}/>

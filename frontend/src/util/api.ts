@@ -1,23 +1,23 @@
-export const transcribeAudio = (blob) => {
-    return fetch("/transcribe", {
-        method: "POST",
-        body: createBody(blob)
-    });
-};
+export const transcribeAudio = (blob, apiKey) => fetch("/transcribe", {
+    method: "POST",
+    headers: {
+        'Openai-Api-Key': apiKey
+    },
+    body: createBody(blob)
+});
 
-export const modifyDocument = (document, documentIsCode, feedback) => {
-    return fetch("/modify", {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            document: base64Encode(document),
-            document_is_code: documentIsCode,
-            feedback: base64Encode(feedback)
-        })
-    });
-};
+export const modifyDocument = (document, documentIsCode, feedback, apiKey) => fetch("/modify", {
+    method: "POST",
+    headers: {
+        'Content-Type': 'application/json',
+        'Openai-Api-Key': apiKey
+    },
+    body: JSON.stringify({
+        document: base64Encode(document),
+        document_is_code: documentIsCode,
+        feedback: base64Encode(feedback)
+    })
+});
 
 
 function base64Encode(str: string) {
