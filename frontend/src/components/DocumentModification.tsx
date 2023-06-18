@@ -149,7 +149,7 @@ export function DocumentModification() {
             <ApiKeyModal isModalOpen={isModalOpen} handleModalClose={handleModalClose} apiKey={apiKey}
                          handleApiKeyChange={handleApiKeyChange}/>
             <HeaderMenuColored/>
-            <Container size={600} className={classes.container}>
+            <Container size={700} className={classes.container}>
                 <TitleSection useVoice={useVoice} isSpeaking={isSpeaking} isProcessing={isProcessing}/>
                 <ProcessingLoaders isSpeaking={isSpeaking} isProcessing={isProcessing}/>
                 <ErrorNotification error={error} setError={setError}/>
