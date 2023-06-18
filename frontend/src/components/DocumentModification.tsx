@@ -60,32 +60,32 @@ export function DocumentModification() {
         () => {
             if (!useVoice) return;
             console.log("speech started")
+            handleModalOpen();
             setIsSpeaking(true)
         },
         async audio => {
-            if (!useVoice) return;
             console.log("speech ended")
             setIsSpeaking(false);
+            if (!useVoice) return;
             await sendAudio(await processAudio(audio));
         },
         () => {
-            if (!useVoice) return;
             console.log("VAD misfire")
+            if (!useVoice) return;
             setIsSpeaking(false)
         })
 
     useControlVoiceDetector(useVoice, voiceDetector, setIsSpeaking)
 
     const handleApiKeyChange = (e) => setApiKey(e.currentTarget.value);
+    const handleModalOpen = () => {
+        if (!apiKey) setIsModalOpen(true)
+    }
 
     const handleModalClose = () => setIsModalOpen(false);
 
     async function sendTextFeedback(feedbackText: string) {
-        if (!apiKey) {
-            setIsModalOpen(true);
-            return;
-        }
-
+        if (!apiKey) return
         try {
             handleProcessingStart();
             setFeedback(feedbackText);
@@ -97,11 +97,7 @@ export function DocumentModification() {
     }
 
     async function sendAudio(blob) {
-        if (!apiKey) {
-            setIsModalOpen(true);
-            return;
-        }
-
+        if (!apiKey) return
         try {
             voiceDetector.pause();
             handleProcessingStart();
@@ -153,7 +149,8 @@ export function DocumentModification() {
                 <TitleSection useVoice={useVoice} isSpeaking={isSpeaking} isProcessing={isProcessing}/>
                 <ProcessingLoaders isSpeaking={isSpeaking} isProcessing={isProcessing}/>
                 <ErrorNotification error={error} setError={setError}/>
-                <FeedbackForm useVoice={useVoice} isProcessing={isProcessing} sendTextFeedback={sendTextFeedback}/>
+                <FeedbackForm useVoice={useVoice} isProcessing={isProcessing} sendTextFeedback={sendTextFeedback}
+                              handleModalOpen={handleModalOpen} />
                 <VoiceFeedback feedback={feedback} useVoice={useVoice} feedbackBackgroundColor={feedbackBackgroundColor}
                                classes={classes}/>
                 <CurrentDocumentDisplay currentDocument={currentDocument} isProcessing={isProcessing}

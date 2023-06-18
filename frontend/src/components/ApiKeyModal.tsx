@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import {Button, createStyles, Modal, rem, Text, TextInput} from "@mantine/core";
 
 const useStyles = createStyles(() => ({
@@ -35,10 +34,3 @@ export const ApiKeyModal = ({ isModalOpen, handleModalClose, apiKey, handleApiKe
         </Modal>
     )
 }
-
-ApiKeyModal.propTypes = {
-    isModalOpen: PropTypes.bool.isRequired,
-    handleModalClose: PropTypes.func.isRequired,
-    apiKey: PropTypes.string.isRequired,
-    handleApiKeyChange: PropTypes.func.isRequired,
-};

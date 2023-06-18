@@ -1,13 +1,12 @@
 import {useState} from "react";
 import {Divider, Textarea, Button, rem} from '@mantine/core';
 
-interface FeedbackFormProps {
-    useVoice: boolean
-    isProcessing: boolean;
-    sendTextFeedback: (feedbackText: string) => Promise<void>;
-}
-
-export const FeedbackForm = ({useVoice, isProcessing, sendTextFeedback}: FeedbackFormProps) => {
+export const FeedbackForm = ({
+                                 useVoice,
+                                 isProcessing,
+                                 sendTextFeedback,
+                                 handleModalOpen
+                             }) => {
     const [feedback, setFeedback] = useState("");
 
     return (
@@ -21,6 +20,7 @@ export const FeedbackForm = ({useVoice, isProcessing, sendTextFeedback}: Feedbac
                     <Textarea
                         placeholder="Type your feedback here"
                         value={feedback}
+                        onClick={handleModalOpen}
                         onChange={e => setFeedback(e.currentTarget.value)}
                         disabled={isProcessing}
                         style={{marginTop: rem(30)}}
