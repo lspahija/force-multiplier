@@ -56,3 +56,6 @@ docker buildx build --platform linux/arm64 -t forcemultiplier .
 docker run -d -e OPENAI_API_KEY=<YOUR_API_KEY> -p 8000:80 forcemultiplier
 ```
 5. Navigate to `localhost:8000` in a modern browser
+
+## Demo
+https://force-multiplier-production.up.railway.app/
