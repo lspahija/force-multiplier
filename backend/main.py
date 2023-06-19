@@ -6,6 +6,7 @@ from fastapi import FastAPI, UploadFile, HTTPException, Header
 from openai.error import AuthenticationError
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 
 from stt import transcribe
 from force_multiplier import apply_feedback, InadequateFeedbackException
@@ -48,6 +49,16 @@ async def modify_document(document_feedback: DocumentFeedback, openai_api_key: s
         raise HTTPException(status_code=400, detail=str(e))
     except AuthenticationError as e:
         raise HTTPException(status_code=401, detail=type(e).__name__)
+
+
+@app.get("/document")
+async def document():
+    return RedirectResponse(url="/")
+
+
+@app.get("/feedback")
+async def feedback():
+    return RedirectResponse(url="/")
 
 
 if os.path.isdir("/app/frontend/dist"):
