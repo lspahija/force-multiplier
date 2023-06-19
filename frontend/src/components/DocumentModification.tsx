@@ -49,7 +49,7 @@ export function DocumentModification() {
     const [useVoice, setUseVoice] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [apiKey, setApiKey] = useState(import.meta.env.VITE_OPENAI_API_KEY_TEST);
+    const [apiKey, setApiKey] = useState(import.meta.env.VITE_OPENAI_API_KEY);
 
     useHighlightDiff(currentDocumentIndex, setHighlightedDocument, currentDocument, documentHistory, diffWordsWithSpace)
     useHighlightOnRefresh(setDiffBackgroundColor, currentDocument);
