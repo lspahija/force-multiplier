@@ -41,7 +41,7 @@ export function InitialDocument() {
                 <Textarea
                     mt="md"
                     placeholder="This is a story about a cat named Milo and a dog named Kelly. Bla bla bla..."
-                    maxRows={10}
+                    maxRows={30}
                     minRows={5}
                     autosize
                     name="message"

@@ -22,7 +22,7 @@ export const CurrentDocumentDisplay = ({currentDocument, isProcessing, isRenderi
                        weight={700} align="center" className={classes.textBlock}>Current document:</Title>
                 <Textarea
                     mt="md"
-                    maxRows={10}
+                    maxRows={30}
                     minRows={5}
                     autosize
                     name="message"
