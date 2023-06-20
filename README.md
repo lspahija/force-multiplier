@@ -59,3 +59,6 @@ docker run -d -e OPENAI_API_KEY=<YOUR_API_KEY> -p 8000:80 forcemultiplier
 
 ## Demo
 https://force-multiplier-production.up.railway.app/
+
+screenshot:
+<img width="1133" alt="Screenshot 2023-06-19 at 10 35 26 PM" src="https://github.com/lspahija/force-multiplier/assets/44912218/0e155226-0d77-4c19-ada1-09cb461ba2bc">
