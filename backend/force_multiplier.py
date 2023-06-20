@@ -134,20 +134,23 @@ def get_mock_completion(document):
 
 
 def apply_diff(document, diff):
-    for change in diff.diff:
+    new_document = ""
+    current_index = 0
+
+    for change in sorted(diff.diff, key=lambda x: document.find(x.start)):
         start = change.start
         end = change.end
         replacement = change.replacement
 
-        block_start_index = document.find(start)
-        if block_start_index != -1:
-            remaining_document = document[block_start_index + len(start):]
-            block_end_index = remaining_document.find(end) + len(end)
+        block_start_index = document.find(start, current_index)
+        block_end_index = document.find(end, block_start_index + len(start)) + len(end)
 
-            if block_end_index != -1:
-                document = document[:block_start_index] + replacement + remaining_document[block_end_index:]
+        if block_start_index != -1 and block_end_index != -1:
+            new_document += document[current_index:block_start_index] + replacement
+            current_index = block_end_index
 
-    return document
+    new_document += document[current_index:]
+    return new_document
 
 
 def get_system_prompt(is_code):
