@@ -1,5 +1,5 @@
-import prettier from "prettier/standalone";
-import parserBabel from "prettier/parser-babel";
+// import prettier from "prettier/standalone";
+// import parserBabel from "prettier/parser-babel";
 import {LiveEditor, LiveError, LivePreview, LiveProvider} from "react-live";
 import {Divider, Textarea, Title} from '@mantine/core';
 import {createStyles, rem} from '@mantine/core';
@@ -49,13 +49,14 @@ export const CurrentDocumentDisplay = ({currentDocument, isProcessing, isRenderi
 }
 
 const formatCode = (currentDocument) => {
-    try {
-        return prettier.format(currentDocument, {
-            parser: "babel",
-            plugins: [parserBabel],
-        })
-    } catch (e) {
-        console.warn(e);
-        return currentDocument
-    }
+    return currentDocument
+    // try {
+    //     return prettier.format(currentDocument, {
+    //         parser: "babel",
+    //         plugins: [parserBabel],
+    //     })
+    // } catch (e) {
+    //     console.warn(e);
+    //     return currentDocument
+    // }
 }

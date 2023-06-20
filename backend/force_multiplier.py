@@ -153,14 +153,14 @@ def apply_diff(document, diff):
 def get_system_prompt(is_code):
     if is_code:
         return """
-    I am an AI capable of editing text based on user feedback. You can give me a document and your feedback about the document, and I will propose changes.
+    I am an AI capable of editing code based on user feedback. You can give me some code and your feedback about the code, and I will propose changes.
 
-    In response to your feedback, I will identify specific sections of text to be replaced. For each section, I will provide the unique 'start' string and unique 'end' string of the block of text to be replaced, as well as the replacement text.
+    In response to your feedback, I will identify specific sections of code to be replaced. For each section, I will provide the unique 'start' string and unique 'end' string of the block of code to be replaced, as well as the replacement code.
     Note: The 'end' string is the first instance of the specified 'end' string that comes after the 'start' string within the block to be replaced.
 
     Here's an example:
 
-    Given the document:
+    Given the code:
         function Car() {
           const [text, setText] = React.useState('Hi, I am a Car!');
         
@@ -222,10 +222,11 @@ def get_system_prompt(is_code):
         ]
     }
     
+    Note how all of the above replacements begin with the "start" string and finish with the "end" string, allowing me to insert code between these two strings without losing those strings.
     I will strictly call the apply_diff function with my response as arguments. I will make no comments outside the "comment" field. 
-    If I am absolutely unable to interpret the feedback in relation to the document, I will call the report_irrelevant_feedback function.
+    If I am absolutely unable to interpret the feedback in relation to the code, I will call the report_irrelevant_feedback function.
     I will only ever call one of these two functions. I will not respond without calling one of these two functions, to guarantee that you can parse my response.
-    The 'start' and 'end' strings are inclusive in block of text that will be replaced. This means that if I want to insert text between two strings, my replacement text will start with the 'start' string and end with the 'end' string, which ensures that the 'start' and 'end' strings will not be removed.
+    The 'start' and 'end' strings are inclusive in the block of code that will be replaced. This means that if I want to insert code between two strings, my 'replacement' code will always start with my exact 'start' string and end with my exact 'end' string. This ensures that the 'start' and 'end' strings are not unwittingly dropped.
     """
     else:
         return """
@@ -262,6 +263,7 @@ def get_system_prompt(is_code):
            I will strictly call the apply_diff function with my response as arguments. I will make no comments outside the "comment" field. 
            If I am absolutely unable to interpret the feedback in relation to the document, I will call the report_irrelevant_feedback function.
            I will only ever call one of these two functions. I will not respond without calling one of these two functions, to guarantee that you can parse my response.
+           The 'start' and 'end' strings are inclusive in the block of text that will be replaced. This means that if I want to insert text between two strings, my 'replacement' text will start with the 'start' string and end with the 'end' string, which ensures that the 'start' and 'end' strings will not be removed.
            """
 
 
