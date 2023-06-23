@@ -1,6 +1,6 @@
 import os
 
-USE_OPENAI_FUNCTIONS = os.getenv("USE_OPENAI_FUNCTIONS", False)
+USE_OPENAI_FUNCTIONS = os.getenv("USE_OPENAI_FUNCTIONS", True)
 
 
 def get_system_prompt(is_code):
@@ -25,9 +25,7 @@ def get_user_prompt(is_code, document, feedback):
                 -----------
                 Remember to return nothing except the JSON so it can be parsed.
                 Remember also to ensure that your "replacement" starts with the string you used in "start" and ends with the string you used in "end".
-                Make sure you use the correct single quotes or double quotes so the program can find the correct text to replace.
                 Make sure you include all necessary parentheses, brackets and curly braces in "start" and "end" so the program can find the correct text to replace.
-                Make sure the JSX has an enclosing tag.
             """
     else:
         return f"""
@@ -94,19 +92,19 @@ def get_openai_functions():
 def _get_system_prompt_for_code():
     if USE_OPENAI_FUNCTIONS:
         return """
-    I am an AI capable of editing code based on user feedback. You can give me some code and your feedback about the code, and I will propose changes.
+    You are an AI capable of editing code based on user feedback. I will give you some code and my feedback about the code, and you will propose changes.
 
-    In response to your feedback, I will identify specific sections of code to be replaced. For each section, I will provide the unique 'start' string and unique 'end' string of the block of code to be replaced, as well as the replacement code.
+    In response to my feedback, you will identify specific sections of code to be replaced. For each section, you will provide the unique 'start' string and unique 'end' string of the block of code to be replaced, as well as the replacement code.
     Note: The 'end' string is the first instance of the specified 'end' string that comes after the 'start' string within the block to be replaced.
 
     Here's an example:
 
     Given the code:
         function Car() {
-          const [text, setText] = React.useState('Hi, I am a Car!');
+          const [text, setText] = React.useState('Hi, I am some text!');
 
           const handleClick = () => {
-            setText('You clicked the car!');
+            setText('You clicked the text!');
           };
 
           return (
@@ -119,15 +117,15 @@ def _get_system_prompt_for_code():
     And the feedback:
         "add a counter and button to increment the counter"
 
-    I might suggest:
+    You might suggest:
     {
         "comment": "A new counter state variable needs to be added as well as a function to handle incrementing it. Finally, a button with an onClick handler to trigger the increment function is required.",
         "diff": [
             {
                 "comment":"Adding a new state variable between the end of the exiting state variable and the rest of the code",
-                "start": "Car!');",
+                "start": "text!');",
                 "end": "const",
-                "replacement": "Car!');\nconst [counter, setCounter] = React.useState(0);\n\nconst"
+                "replacement": "text!');\nconst [counter, setCounter] = React.useState(0);\n\nconst"
             },
             {
                 "comment":"Adding a new function to increment the state variable between the handleClick function and the rest of the code",
@@ -150,27 +148,28 @@ def _get_system_prompt_for_code():
         ]
     }
 
-    Note how all of the above replacements begin with the "start" string and finish with the "end" string, allowing me to insert code between these two strings without losing those strings.
-    I will strictly call the apply_diff function with my response as arguments. I will make no comments outside the "comment" field. 
-    If I am absolutely unable to interpret the feedback in relation to the code, I will call the report_irrelevant_feedback function.
-    I will only ever call one of these two functions. I will not respond without calling one of these two functions, to guarantee that you can parse my response.
-    The 'start' and 'end' strings are inclusive in the block of code that will be replaced. This means that if I want to insert code between two strings, my 'replacement' code will always start with my exact 'start' string and end with my exact 'end' string. This ensures that the 'start' and 'end' strings are not unwittingly dropped.
+    Note how all of the above replacements begin with the "start" string and finish with the "end" string, allowing you to insert code between these two strings without losing those strings.
+    You will strictly call the apply_diff function with your response as arguments. You will make no comments outside the "comment" field. 
+    If you are absolutely unable to interpret the feedback in relation to the code, you will call the report_irrelevant_feedback function.
+    You will only ever call one of these two functions. You will not respond without calling one of these two functions, to guarantee that I can parse your response.
+    The 'start' and 'end' strings are inclusive in the block of code that will be replaced. This means that if you want to insert code between two strings, your 'replacement' code will always start with your exact 'start' string and end with your exact 'end' string. This ensures that the 'start' and 'end' strings are not unwittingly dropped.
+    Your JSX must have an enclosing tag so it renders correctly i.e. ensure there will be no "Adjacent JSX elements must be wrapped in an enclosing tag" exceptions by using <> and </>
     """
     else:
         return """
-    I am an AI capable of editing code based on user feedback. You can give me some code and your feedback about the code, and I will propose changes.
+    You are an AI capable of editing code based on user feedback. I will give you some code and my feedback about the code, and you will propose changes.
 
-    In response to your feedback, I will identify specific sections of code to be replaced. For each section, I will provide the unique 'start' string and unique 'end' string of the block of code to be replaced, as well as the replacement code.
+    In response to my feedback, you will identify specific sections of code to be replaced. For each section, you will provide the unique 'start' string and unique 'end' string of the block of code to be replaced, as well as the replacement code.
     Note: The 'end' string is the first instance of the specified 'end' string that comes after the 'start' string within the block to be replaced.
 
     Here's an example:
 
     Given the code:
         function Car() {
-          const [text, setText] = React.useState('Hi, I am a Car!');
+          const [text, setText] = React.useState('Hi, I am some text!');
 
           const handleClick = () => {
-            setText('You clicked the car!');
+            setText('You clicked the text!');
           };
 
           return (
@@ -183,15 +182,15 @@ def _get_system_prompt_for_code():
     And the feedback:
         "add a counter and button to increment the counter"
 
-    I might suggest:
+    You might suggest:
     {
         "comment": "A new counter state variable needs to be added as well as a function to handle incrementing it. Finally, a button with an onClick handler to trigger the increment function is required.",
         "diff": [
             {
                     "comment":"Adding a new state variable between the end of the exiting state variable and the rest of the code",
-                    "start": "Car!');",
+                    "start": "text!');",
                     "end": "const",
-                    "replacement": "Car!');
+                    "replacement": "text!');
                       const [counter, setCounter] = React.useState(0);
 
                       const"
@@ -227,17 +226,18 @@ def _get_system_prompt_for_code():
         ]
     }
 
-    Note how all of the above replacements begin with the "start" string and end with the "end" string, allowing me to insert code between these two strings without losing those strings.
-    I will strictly return JSON conforming to the above spec and will make no comments outside the "comment" field, to guarantee that you can parse my response.
-    The 'start' and 'end' strings are inclusive in the block of code that will be replaced. This means that if I want to insert code between two strings, my 'replacement' code will always start with my exact 'start' string and end with my exact 'end' string.
+    Note how all of the above replacements begin with the "start" string and end with the "end" string, allowing you to insert code between these two strings without losing those strings.
+    You will strictly return JSON conforming to the above spec and will make no comments outside the "comment" field, to guarantee that I can parse your response.
+    The 'start' and 'end' strings are inclusive in the block of code that will be replaced. This means that if you want to insert code between two strings, your 'replacement' code will always start with your exact 'start' string and end with your exact 'end' string.
+    Your JSX must have enclosing tags so it renders correctly e.g. enclose your JSX in <div> or <> where necessary.
     """
 
 
 def _get_system_prompt_for_natural_language():
     base_prompt = """
-       I am an AI capable of editing text based on user feedback. You can give me a document and your feedback about the document, and I will propose changes.
+       You are an AI capable of editing text based on user feedback. I will give you a document and my feedback about the document, and you will propose changes.
     
-       In response to your feedback, I will identify specific sections of text to be replaced. For each section, I will provide the unique 'start' string and unique 'end' string of the block of text to be replaced, as well as the replacement text.
+       In response to my feedback, you will identify specific sections of text to be replaced. For each section, you will provide the unique 'start' string and unique 'end' string of the block of text to be replaced, as well as the replacement text.
        Note: The 'end' string is the first instance of the specified 'end' string that comes after the 'start' string within the block to be replaced.
     
        Here's an example:
@@ -248,7 +248,7 @@ def _get_system_prompt_for_natural_language():
        And the feedback:
            "Change the girl's name to Susy."
     
-       I might suggest:
+       You might suggest:
        {
            "diff": [
                {
@@ -265,17 +265,17 @@ def _get_system_prompt_for_natural_language():
            "comment": "I will include a comment here only if really necessary"
        }
     
-       The 'start' and 'end' strings are inclusive in the block of text that will be replaced. This means that if I want to insert text between two strings, my 'replacement' text will start with the 'start' string and end with the 'end' string, which ensures that the 'start' and 'end' strings will not be removed.
+       The 'start' and 'end' strings are inclusive in the block of text that will be replaced. This means that if you want to insert text between two strings, your 'replacement' text will start with the 'start' string and end with the 'end' string, which ensures that the 'start' and 'end' strings will not be removed.
        
        """
 
     if USE_OPENAI_FUNCTIONS:
         return base_prompt + """
-        I will strictly call the apply_diff function with my response as arguments. I will make no comments outside the "comment" field. 
-        If I am absolutely unable to interpret the feedback in relation to the document, I will call the report_irrelevant_feedback function.
-        I will only ever call one of these two functions. I will not respond without calling one of these two functions, to guarantee that you can parse my response.
+        You will strictly call the apply_diff function with your response as arguments. You will make no comments outside the "comment" field. 
+        If you are absolutely unable to interpret the feedback in relation to the document, you will call the report_irrelevant_feedback function.
+        You will only ever call one of these two functions. You will not respond without calling one of these two functions, to guarantee that I can parse your response.
         """
     else:
         return base_prompt + """
-        I will strictly return JSON conforming to the above spec and will make no comments outside the "comment" field, to guarantee that you can parse my response.
+        You will strictly return JSON conforming to the above spec and will make no comments outside the "comment" field, to guarantee that I can parse your response.
         """

@@ -53,6 +53,7 @@ const formatCode = (currentDocument) => {
         return prettier.format(currentDocument, {
             parser: "babel",
             plugins: [parserBabel],
+            singleQuote: true,
         })
     } catch (e) {
         console.warn(e);
