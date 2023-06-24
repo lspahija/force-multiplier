@@ -45,7 +45,7 @@ async def get_completion(messages, api_key):
         "messages": messages,
         "api_key": api_key,
         "timeout": 15,
-        "temperature": 0.6,
+        "temperature": 0.2,
     }
 
     if USE_OPENAI_FUNCTIONS:
