@@ -24,6 +24,8 @@ Force Multiplier allows the user to iteratively provide feedback to GPT-4, which
 
 The goal of Force Multiplier is to multiply the user's productivity by enabling them to become a supervisor that leverages GPT-4 as a subordinate worker.
 
+https://github.com/lspahija/force-multiplier/assets/44912218/09b5e1fd-427c-4796-a140-a74b5cf54e55
+
 ### Efficiency
 
 Force Multiplier only modifies the portions of your artifact that require modification, given your feedback. The rest of the artifact remains unchanged. This allows for fast iteration because it's not necessary to wait for the LLM to regenerate the entire artifact after each piece of feedback is given.
@@ -59,6 +61,3 @@ docker run -d -e OPENAI_API_KEY=<YOUR_API_KEY> -p 8000:80 forcemultiplier
 
 ## Demo
 https://force-multiplier-production.up.railway.app/
-
-screenshot:
-<img width="1133" alt="Screenshot 2023-06-19 at 10 35 26 PM" src="https://github.com/lspahija/force-multiplier/assets/44912218/0e155226-0d77-4c19-ada1-09cb461ba2bc">
