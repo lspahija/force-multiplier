@@ -24,7 +24,7 @@ Force Multiplier allows the user to iteratively provide feedback to GPT-4, which
 
 The goal of Force Multiplier is to multiply the user's productivity by enabling them to become a supervisor that leverages GPT-4 as a subordinate worker.
 
-https://github.com/lspahija/force-multiplier/assets/44912218/e59735f6-4507-46a0-985f-d676df6c5d4b
+https://github.com/lspahija/force-multiplier/assets/44912218/6c76aeb7-385f-4804-9818-c24f8dbbb4f0
 
 ### Efficiency
 
