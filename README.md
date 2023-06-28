@@ -32,9 +32,7 @@ Force Multiplier only modifies the portions of your artifact that require modifi
 
 ### Core Functionality
 
-Force Multiplier allows you to input any block of text as your initial document (artifact). You can then provide your feedback on this document, in terms of specific changes or overall sentiment. Force Multiplier will take your feedback, interpret it, and automatically modify your document in accordance with the feedback you provided.
-
-You can iteratively provide feedback and watch your document change before your eyes until you arrive at your desired end result.
+With Force Multiplier, you can input any block of text as your initial document (artifact). Then, simply speak your feedback regarding specific changes or the overall sentiment. Force Multiplier interprets your spoken input and automatically adjusts your document accordingly. Through this iterative process, you can shape your document to your satisfaction.
 
 ## Run it Locally  
 1. Clone the repo
