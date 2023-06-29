@@ -75,9 +75,9 @@ export function Hero() {
             <div className={classes.wrapper}>
                 <Container size={700} className={classes.inner}>
                     <h1 className={classes.title}>
-                        Feedback is{' '}
+                        We are all{' '}
                         <Text component="span" variant="gradient" gradient={{from: 'red', to: 'indigo'}} inherit>
-                            all you need
+                            supervisors
                         </Text>
                     </h1>
 
